@@ -99,6 +99,17 @@
   .panel-no{width:22px;height:22px;border-radius:50%;background:var(--blue-light);
     color:var(--blue);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
   .panel-title{font-size:16px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+  .help-tip{position:relative;display:inline-flex;align-items:center;}
+  .help-icon{width:16px;height:16px;border-radius:50%;border:1px solid var(--t3);
+    color:var(--t3);font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;user-select:none;}
+  .help-icon:hover{border-color:var(--blue);color:var(--blue);}
+  .help-pop{position:absolute;top:24px;left:0;z-index:30;width:360px;max-width:78vw;
+    max-height:340px;overflow:auto;background:#fff;border:1px solid var(--line);
+    border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.12);padding:14px 16px;
+    font-size:12px;line-height:1.7;color:var(--t1);white-space:pre-wrap;
+    display:none;font-weight:400;}
+  .help-tip:hover .help-pop,.help-tip.show .help-pop{display:block;}
   .panel-tip{font-size:12px;color:var(--t3);margin-left:auto;}
   .lib-search{margin-left:auto;width:120px;min-width:0;border:1px solid var(--line);border-radius:8px;
     padding:5px 10px;font-size:12px;color:var(--t1);background:#fff;}
@@ -317,6 +328,20 @@
           <div class="panel-head">
             <span class="panel-no">1</span>
             <span class="panel-title">描述你想要的音色</span>
+            <span class="help-tip">
+              <span class="help-icon">?</span>
+              <span class="help-pop">请您对期望生成的声音进行整体描述，可参考如下维度：
+1. 性别："男" | "女"
+2. 年龄："儿童" | "少年" | "青年" | "中年" | "老年"
+3. 音调："低" | "偏低" | "中" | "偏高" | "高"
+4. 基频："极低" | "低" | "偏低" | "中" | "偏高" | "高" | "极高"
+5. 声线："细" | "粗" | "中"
+6. 音色："通用","发嗲","温柔","痞气","慵懒","低沉","轻快","明亮","清脆","甜美","稚气","妩媚","磁性","沙哑","洪亮","浑厚","浑浊","夹子音","鼻音重","气息感强","颗粒感明显","共鸣丰富","喉音重","齿音锐利","口腔共鸣突出"
+7. 情感："自然" | "严肃" | "惊讶" | "疑问" | "开心" | "鼓励" | "认同" | "撒娇" | "关心" | "思考" | "低落" | "尴尬抱歉" | "悄悄话（气声）" | "感激" | "抒情" | "抱怨" | "愤怒" | "冷漠" | "恐惧" | "不屑/嫌弃" | "激动" | 等
+8. 氛围："亲切" | "专业" | "活泼" | "庄重" | "紧张" | "梦幻" | "轻松" | "权威感" | "商业感" | 等
+9. 场景："直播（电商/赛事/情感等）" | "播客" | "影视剧" | "正式演讲（报告/演说/致辞等）" | "信息播报" | "智能客服" | "教学" | "自媒体平台（短视频/B站等）" | "相声" | 等
+10. 身份："老师" | "学生" | "演员" | "主播" | "播音员" | "旁白" | "主持人" | "虚拟助手" | "销售" | "客服" | "法官" | "小贩" | "职业人员" | 等</span>
+            </span>
             <span class="panel-tip">用自然语言描述音色特征</span>
           </div>
           <textarea id="prompt" placeholder="一位年迈的智者，声音略带沙哑但充满智慧，语速平缓，讲述着人生的哲理。"></textarea>
@@ -914,6 +939,15 @@
   function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));}
   renderLibrary();
   $("libSearch").addEventListener("input",()=>{ libPage=1; renderLibrary(); });
+
+  // 描述音色的帮助提示：点击图标切换显示，点击别处收起
+  document.querySelectorAll(".help-tip").forEach(tip=>{
+    const icon = tip.querySelector(".help-icon");
+    icon.addEventListener("click",(e)=>{ e.stopPropagation(); tip.classList.toggle("show"); });
+  });
+  document.addEventListener("click",()=>{
+    document.querySelectorAll(".help-tip.show").forEach(t=>t.classList.remove("show"));
+  });
 
   $("saveBtn").addEventListener("click",()=>{
     const name = $("vName").value.trim();
