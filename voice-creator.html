@@ -88,6 +88,13 @@
   .col-right .panel{flex:1;}
   .col-left .panel:last-child{flex:1;}
   @media (max-width:860px){.layout{grid-template-columns:1fr;}}
+
+  /* 2.0 合并板块：一个卡片内左右两栏（描述 + 试听文本）*/
+  .combo-panel{margin-bottom:24px;}
+  .combo-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:start;}
+  .combo-col{display:flex;flex-direction:column;}
+  .combo-col .roles{flex:none;}
+  @media (max-width:860px){.combo-cols{grid-template-columns:1fr;gap:20px;}}
   .empty-state{text-align:center;color:var(--t3);padding:40px 16px;}
   .empty-icon{font-size:40px;margin-bottom:10px;}
   .empty-sub{font-size:12px;color:var(--t3);margin-top:6px;}
@@ -123,11 +130,12 @@
   textarea::placeholder,input::placeholder{color:var(--t3);}
   textarea:focus,input:focus{outline:none;border-color:var(--blue);}
   textarea{min-height:80px;}
-  #prompt{min-height:150px;}
-  #text{min-height:150px;}
+  #prompt{min-height:200px;}
+  #text{min-height:200px;}
 
   .roles-head{display:flex;align-items:center;margin:14px 0 8px;}
   .roles-head .label{font-size:12px;color:var(--t3);}
+  .roles-refresh{margin-left:8px;}
   .btn-ghost{
     background:#fff; color:var(--blue);
     border:1px solid var(--blue); border-radius:6px;
@@ -135,9 +143,12 @@
     white-space:nowrap; flex-shrink:0;
   }
   .btn-ghost:hover{background:var(--blue-light);}
+  #randomText{display:inline-flex;align-items:center;gap:4px;}
+  .gen-ic{flex-shrink:0;}
   .head-btn{margin-left:auto;}
+  .refresh-sm{padding:2px 8px;font-size:11px;}
   .roles-row{display:flex;align-items:flex-start;gap:8px;}
-  .roles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1;}
+  .roles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:none;}
   .role-card{
     display:flex; align-items:center; gap:6px; justify-content:center;
     border:1px solid var(--line); border-radius:16px; padding:5px 8px;
@@ -163,9 +174,12 @@
     border-radius:50%;animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  .results{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px;}
+  .results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px;}
+  #resultPanel{padding:16px 20px;}
+  #resultPanel .panel-head{margin-bottom:10px;}
+  #resultPanel .empty-state{padding:24px 16px;}
   .voice-card{
-    border:2px solid var(--line); border-radius:12px; padding:16px;
+    border:2px solid var(--line); border-radius:12px; padding:12px;
     cursor:pointer; transition:all .2s; background:#fff; position:relative;
   }
   .voice-card:hover{border-color:var(--blue-light);}
@@ -173,11 +187,11 @@
   .voice-card .check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;
     background:var(--blue);color:#fff;font-size:11px;display:none;align-items:center;justify-content:center;}
   .voice-card.selected .check{display:none;}
-  .voice-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .voice-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
   .voice-name{font-size:15px;font-weight:600;}
   .voice-tag{font-size:12px;color:var(--t2);background:var(--bg);border-radius:6px;
     padding:2px 8px;display:inline-block;}
-  .adjust-btn{margin-left:auto;display:inline-flex;align-items:center;gap:4px;
+  .adjust-btn{display:inline-flex;align-items:center;gap:4px;
     border:1px solid var(--line);background:#fff;border-radius:6px;padding:3px 8px;
     font-size:12px;color:var(--t2);cursor:pointer;transition:all .2s;}
   .adjust-btn:hover{border-color:var(--blue);color:var(--blue);}
@@ -191,7 +205,7 @@
     cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;}
   .step-btn:hover{background:#eef0f7;color:var(--blue);}
   .step-val{min-width:46px;text-align:center;font-size:13px;color:var(--t1);}
-  .voice-settings .vs-fmt{border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:13px;color:var(--t1);background:#fff;}
+  .voice-settings .vs-fmt{width:92px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px;color:var(--t1);background:#fff;text-align:center;}
   .play-row{display:flex;align-items:center;gap:8px;}
   .play-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--blue);
     background:#fff;color:var(--blue);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -270,7 +284,7 @@
   .param-head{display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:6px;}
   .param input[type=range]{width:100%;accent-color:var(--blue);}
   .history-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto;}
-  .history-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;}
+  .history-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:default;}
   .history-item .h-info{flex:1;min-width:0;}
   .history-item .h-text{font-size:13px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .history-item .h-meta{font-size:11px;color:var(--t3);}
@@ -279,6 +293,15 @@
   .history-item .h-dl:hover{border-color:var(--blue);color:var(--blue);}
   .history-empty{font-size:12px;color:var(--t3);text-align:center;padding:20px 0;}
 
+  /* 合成记录右键菜单 */
+  .ctx-menu{position:fixed;z-index:120;background:#fff;border:1px solid var(--line);
+    border-radius:8px;box-shadow:var(--shadow-modal);padding:4px;min-width:96px;display:none;}
+  .ctx-menu.show{display:block;}
+  .ctx-item{padding:8px 12px;font-size:13px;color:var(--t1);border-radius:6px;cursor:pointer;}
+  .ctx-item:hover{background:var(--bg);}
+  .ctx-item.danger{color:#F5483B;}
+  .ctx-item.danger:hover{background:#FDECEA;}
+
   @media (max-width:560px){
     .roles{grid-template-columns:repeat(2,1fr);}
     .results{grid-template-columns:1fr;}
@@ -286,8 +309,8 @@
 
   /* ===== 2.0 顶部页面切换 + 音色库页 ===== */
   .page-switch{max-width:1100px;margin:0 auto;padding:18px 16px 0;display:flex;gap:12px;}
-  .ps-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
-    border-radius:12px;padding:12px 22px;font-size:15px;font-weight:600;color:var(--t2);
+  .ps-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:9px 20px;font-size:16px;font-weight:600;color:var(--t2);
     cursor:pointer;box-shadow:var(--shadow);transition:all .2s;}
   .ps-btn:hover{border-color:var(--blue);color:var(--blue);}
   .ps-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;}
@@ -361,11 +384,11 @@
   <!-- 2.0 顶部页面切换 -->
   <div class="page-switch">
     <button class="ps-btn active" data-page="create">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
-      首页
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+      音色创造
     </button>
     <button class="ps-btn" data-page="store">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="6" y2="18"/><line x1="11" y1="3" x2="11" y2="21"/><line x1="16" y1="8" x2="16" y2="16"/><line x1="21" y1="5" x2="21" y2="19"/></svg>
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="10" x2="4" y2="14"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="16" y1="6" x2="16" y2="18"/><line x1="20" y1="10" x2="20" y2="14"/></svg>
       音色库
     </button>
   </div>
@@ -373,13 +396,12 @@
   <!-- ===== 第一页：发音人创造 ===== -->
   <div class="page active" id="pageCreate">
   <div class="wrap">
-    <div class="layout">
-      <!-- 左列 -->
-      <div class="col-left">
-        <!-- 1. 提示词板块 -->
-        <section class="panel">
+    <!-- 1+2 合并为一个板块：左描述 + 右试听文本 -->
+    <section class="panel combo-panel">
+      <div class="combo-cols">
+        <!-- 左：描述音色 -->
+        <div class="combo-col combo-left">
           <div class="panel-head">
-            <span class="panel-no">1</span>
             <span class="panel-title">描述你想要的音色</span>
             <span class="help-tip">
               <span class="help-icon">?</span>
@@ -395,55 +417,49 @@
 9. 场景："直播（电商/赛事/情感等）" | "播客" | "影视剧" | "正式演讲（报告/演说/致辞等）" | "信息播报" | "智能客服" | "教学" | "自媒体平台（短视频/B站等）" | "相声" | 等
 10. 身份："老师" | "学生" | "演员" | "主播" | "播音员" | "旁白" | "主持人" | "虚拟助手" | "销售" | "客服" | "法官" | "小贩" | "职业人员" | 等</span>
             </span>
-            <span class="panel-tip">用自然语言描述音色特征</span>
           </div>
-          <textarea id="prompt" placeholder="一位年迈的智者，声音略带沙哑但充满智慧，语速平缓，讲述着人生的哲理。"></textarea>
+          <textarea id="prompt" placeholder="一位年迈的老奶奶，略带苍老沙哑的柔和声线，语速缓慢拖沓，语气温和慈爱，说话带着细碎的温柔尾调。"></textarea>
           <div class="roles-head">
             <span class="label">不知道怎么写？点一个角色试试</span>
-            <button class="btn-ghost head-btn" id="refreshRoles">换一批</button>
+            <button class="btn-ghost refresh-sm roles-refresh" id="refreshRoles">换一批</button>
           </div>
           <div class="roles" id="roles"></div>
-        </section>
+        </div>
 
-        <!-- 2. 试听文本板块 -->
-        <section class="panel">
+        <!-- 右：试听文本 -->
+        <div class="combo-col combo-right">
           <div class="panel-head">
-            <span class="panel-no">2</span>
             <span class="panel-title">试听文本</span>
-            <button class="btn-ghost head-btn" id="randomText">自动生成</button>
+            <button class="btn-ghost head-btn" id="randomText"><svg class="gen-ic" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>自动生成</button>
           </div>
-          <textarea id="text" placeholder="输入一段用于试听的文字，或点击上方角色自动填入。"></textarea>
+          <textarea id="text" placeholder="输入一段用于试听的文字，或点击自动生成"></textarea>
           <div class="gen-bar">
             <button class="btn-primary" id="genBtn">生成音色</button>
           </div>
-        </section>
+        </div>
       </div>
+    </section>
 
-      <!-- 右列 -->
-      <div class="col-right">
-        <!-- 3. 音色效果板块（常驻）-->
-        <section class="panel" id="resultPanel">
-          <div class="panel-head">
-            <span class="panel-no">3</span>
-            <span class="panel-title">音色效果</span>
-            <span class="panel-tip">选择一个你满意的音色</span>
-          </div>
-          <div id="emptyState" class="empty-state">
-            <div class="empty-icon">🎧</div>
-            <div>还没有生成音色</div>
-            <div class="empty-sub">在左侧描述音色并点击「生成音色」</div>
-          </div>
-          <div id="loading" class="loading hidden">
-            <div class="spinner"></div>
-            <span>正在为你生成音色…</span>
-          </div>
-          <div class="results hidden" id="results"></div>
-          <div class="confirm-bar hidden" id="confirmBar">
-            <button class="btn-primary" id="confirmBtn" disabled>保存音色</button>
-          </div>
-        </section>
+    <!-- 3. 音色效果板块（在下方，横向排列）-->
+    <section class="panel" id="resultPanel">
+      <div class="panel-head">
+        <span class="panel-title">音色效果</span>
+        <span class="panel-tip hidden" id="resultTip">选择一个你满意的音色</span>
       </div>
-    </div>
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">🎧</div>
+        <div>还没有生成音色</div>
+        <div class="empty-sub">在上方描述音色并点击「生成音色」</div>
+      </div>
+      <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <span>正在为你生成音色…</span>
+      </div>
+      <div class="results hidden" id="results"></div>
+      <div class="confirm-bar hidden" id="confirmBar">
+        <button class="btn-primary" id="confirmBtn" disabled>保存音色</button>
+      </div>
+    </section>
   </div>
   </div><!-- /pageCreate -->
 
@@ -460,6 +476,7 @@
         <input type="text" id="storeSearch" class="store-search" placeholder="搜索音色名称 / 标签…" />
       </div>
       <div class="store-grid" id="storeGrid"></div>
+      <div class="lib-pager" id="storePager"></div>
     </section>
   </div>
   </div><!-- /pageStore -->
@@ -515,6 +532,11 @@
   </div>
 
   <div class="toast" id="toast">保存成功</div>
+
+  <!-- 合成记录右键菜单 -->
+  <div class="ctx-menu" id="histMenu">
+    <div class="ctx-item danger" id="histDelete">删除</div>
+  </div>
 
   <!-- 合成页（“使用”进入的新页面，全屏覆盖）-->
   <div class="synth-page" id="synthPage">
@@ -700,6 +722,33 @@
       "听我说，这事儿啊，你绝对想不到结局，简直太离谱了！",
       "我跟你讲，今天发生的事，笑得我饭都喷出来了，绝了！",
       "别急别急，重点来了——结果他居然把钥匙锁在了车里！"
+    ]},
+    {keys:["上司","老板","领导","严厉","凶","高高在上","威严","训","训斥","严肃","命令","强势","霸道","领导力"], texts:[
+      "这份报告我看了，问题一大堆，重做！下班前必须放到我桌上。",
+      "我不想听借口，结果呢？公司请你来是解决问题的，不是来找理由的。",
+      "你以为这是闹着玩吗？这点小事都办不好，怎么让我把项目交给你？",
+      "我再强调最后一遍，按我说的做，别自作主张，出了问题谁负责？",
+      "时间就是金钱，别磨蹭，这个方案今天必须定下来，没有商量的余地。"
+    ]},
+    {keys:["客服","礼貌","服务","咨询","耐心","亲切","热线"], texts:[
+      "您好，很高兴为您服务，请问有什么可以帮您的吗？",
+      "非常抱歉给您带来不便，我们会尽快为您处理，请您稍候。",
+      "感谢您的耐心等待，您反馈的问题已经记录，我们会及时跟进。"
+    ]},
+    {keys:["撒娇","可爱","萌妹","奶","嗲","甜","女友"], texts:[
+      "哎呀人家等你好久啦，你怎么才回消息嘛，不理你了哼～",
+      "今天好累哦，可不可以抱抱我呀，就一下下嘛～",
+      "你最好啦，答应人家的事可不许反悔哦，拉钩钩！"
+    ]},
+    {keys:["教学","老师","课堂","讲解","教育","教程","知识"], texts:[
+      "同学们注意了，这个知识点是重点，考试经常会考到，一定要记牢。",
+      "我们先来回顾上节课的内容，再一起进入今天的新知识。",
+      "不要怕犯错，错了我们一起分析原因，弄懂了就是你的收获。"
+    ]},
+    {keys:["恐怖","悬疑","低沉","阴森","惊悚","诡异","恐惧"], texts:[
+      "夜深了，走廊尽头那扇门，又一次缓缓地打开了。",
+      "你听，那个声音越来越近，可四周却空无一人。",
+      "镜子里的人，为什么……和你的动作慢了半拍？"
     ]}
   ];
   const DEFAULT_TEXTS = [
@@ -720,7 +769,7 @@
   }
   $("randomText").addEventListener("click", ()=>{
     const prompt = promptEl.value.trim();
-    if(!prompt){ showToastText("请先在上方描述你想要的音色"); return; }
+    if(!prompt){ showToastText("请先在左侧描述你想要的音色"); return; }
     textEl.value = generateTextByPrompt(prompt);
   });
 
@@ -731,6 +780,7 @@
     $("emptyState").classList.add("hidden");
     resultsEl.classList.add("hidden");
     confirmBar.classList.add("hidden");
+    $("resultTip").classList.add("hidden");
     loadingEl.classList.remove("hidden");
     selectedVoice = null;
     setTimeout(()=>{
@@ -766,7 +816,6 @@
         <div class="check">✓</div>
         <div class="voice-head">
           <span class="voice-name">${n}</span>
-          <span class="voice-tag">${VOICE_TAGS[i]}</span>
           <button class="adjust-btn" type="button" title="调节">调节</button>
         </div>
         <div class="play-row">
@@ -816,6 +865,7 @@
       </div>`).join("");
     resultsEl.classList.remove("hidden");
     confirmBar.classList.remove("hidden");
+    $("resultTip").classList.remove("hidden");
     confirmBtn.disabled = true;
 
     resultsEl.querySelectorAll(".voice-card").forEach(card=>{
@@ -935,11 +985,25 @@
     {id:"s5", name:"新闻播报", avatar:"📺", tag:"播音", desc:"标准专业播音腔，字正腔圆，适合正式新闻与信息播报。"},
     {id:"s6", name:"治愈电台", avatar:"🌙", tag:"温柔", desc:"低柔舒缓的夜间电台女声，温柔慵懒，适合情感陪伴。"},
     {id:"s7", name:"热血解说", avatar:"🔥", tag:"解说", desc:"激情澎湃的男声，爆发力强，适合赛事与游戏解说。"},
-    {id:"s8", name:"童话姐姐", avatar:"🧚", tag:"儿童", desc:"轻柔治愈的女声，语调温暖，适合睡前故事与儿童绘本。"}
+    {id:"s8", name:"童话姐姐", avatar:"🧚", tag:"儿童", desc:"轻柔治愈的女声，语调温暖，适合睡前故事与儿童绘本。"},
+    {id:"s9", name:"磁性大叔", avatar:"🧔", tag:"磁性", desc:"成熟低沉的中年男声，慵懒随性，带一点烟嗓质感。"},
+    {id:"s10", name:"知性女声", avatar:"👩‍🏫", tag:"知性", desc:"知性优雅的成熟女声，语气从容，适合财经与人文讲解。"},
+    {id:"s11", name:"温暖大哥", avatar:"😎", tag:"口播", desc:"亲切随和的青年男声，真诚自然，适合生活分享和口播。"},
+    {id:"s12", name:"萌系少年", avatar:"🧒", tag:"少年", desc:"清亮活泼的少年音，干净有朝气，适合动漫与游戏配音。"},
+    {id:"s13", name:"商务女声", avatar:"💼", tag:"商务", desc:"干练利落的职场女声，专业稳重，适合企业宣传与产品介绍。"},
+    {id:"s14", name:"搞笑大叔", avatar:"🤪", tag:"搞怪", desc:"夸张诙谐的中年男声，节奏跳脱，适合段子与搞笑短视频。"},
+    {id:"s15", name:"沉稳旁白", avatar:"🎬", tag:"旁白", desc:"低沉沉稳的男声，节奏从容，适合影视纪录与广告旁白。"},
+    {id:"s16", name:"甜美客服", avatar:"☎️", tag:"客服", desc:"温柔甜美的女声，亲和有礼，适合智能客服与语音助手。"},
+    {id:"s17", name:"评书先生", avatar:"📖", tag:"评书", desc:"抑扬顿挫的男声，富有韵律，适合评书与传统故事讲述。"},
+    {id:"s18", name:"清新少女", avatar:"🌸", tag:"清新", desc:"清新自然的少女声，语调轻快，适合校园与生活类内容。"},
+    {id:"s19", name:"威严法官", avatar:"⚖️", tag:"权威", desc:"庄重有力的男声，带权威感，适合正式宣读与法务场景。"},
+    {id:"s20", name:"温柔教师", avatar:"👩‍🎓", tag:"教学", desc:"温和耐心的女声，吐字清晰，适合在线课程与教学讲解。"}
   ];
 
   // ===== 音色库页：三个标签 =====
   let curLibTab = "store";
+  let storePage = 1;
+  const STORE_PAGE_SIZE = 8;
   const storeGrid = $("storeGrid");
   function isFav(id){ return getFavs().includes(id); }
   function toggleFav(id){
@@ -964,15 +1028,37 @@
       cards = favVoices.map(v=>storeCardHtml(v, "fav"));
     }
 
+    const pager = $("storePager");
     if(cards.length===0){
-      const tip = curLibTab==="mine" ? "还没有保存的音色，去首页生成并保存一个吧～"
+      const tip = curLibTab==="mine" ? "还没有保存的音色，去音色创造页生成并保存一个吧～"
                 : curLibTab==="fav" ? "还没有收藏的音色，在「音色库」里点收藏试试～"
                 : (q?"没有找到匹配的音色":"暂无音色");
       storeGrid.innerHTML = `<div class="store-empty">${tip}</div>`;
+      pager.classList.add("hidden"); pager.innerHTML="";
       return;
     }
-    storeGrid.innerHTML = cards.join("");
+
+    // 分页：每页 8 个
+    const totalPages = Math.ceil(cards.length / STORE_PAGE_SIZE);
+    if(storePage > totalPages) storePage = totalPages;
+    if(storePage < 1) storePage = 1;
+    const start = (storePage-1)*STORE_PAGE_SIZE;
+    storeGrid.innerHTML = cards.slice(start, start+STORE_PAGE_SIZE).join("");
     bindStoreEvents();
+
+    if(totalPages<=1){ pager.classList.add("hidden"); pager.innerHTML=""; }
+    else{
+      pager.classList.remove("hidden");
+      let html = `<button class="pager-btn" data-p="${storePage-1}" ${storePage===1?"disabled":""}>‹</button>`;
+      for(let p=1;p<=totalPages;p++){
+        html += `<button class="pager-btn ${p===storePage?"active":""}" data-p="${p}">${p}</button>`;
+      }
+      html += `<button class="pager-btn" data-p="${storePage+1}" ${storePage===totalPages?"disabled":""}>›</button>`;
+      pager.innerHTML = html;
+      pager.querySelectorAll(".pager-btn").forEach(b=>{
+        b.addEventListener("click",()=>{ if(b.disabled) return; storePage=+b.dataset.p; renderStore(); });
+      });
+    }
   }
   function storeCardHtml(v, ctx){
     const fav = isFav(v.id);
@@ -1014,7 +1100,13 @@
     storeGrid.querySelectorAll("[data-mine-edit]").forEach(b=>b.addEventListener("click",()=>openModal(+b.dataset.mineEdit)));
     storeGrid.querySelectorAll("[data-mine-pub]").forEach(b=>b.addEventListener("click",()=>{
       const i=+b.dataset.minePub; const list=getList();
-      if(list[i].published){ showToastText("该音色已发布"); return; }
+      if(list[i].published){
+        if(confirm(`是否取消发布音色「${list[i].name}」？`)){
+          list[i].published=false; setList(list); renderStore();
+          showToastText("已取消发布「"+list[i].name+"」");
+        }
+        return;
+      }
       list[i].published=true; setList(list); renderStore(); showToastText("「"+list[i].name+"」已发布");
     }));
     storeGrid.querySelectorAll("[data-mine-del]").forEach(b=>b.addEventListener("click",()=>{
@@ -1024,9 +1116,9 @@
   }
   document.querySelectorAll(".lib-tab").forEach(t=>t.addEventListener("click",()=>{
     document.querySelectorAll(".lib-tab").forEach(x=>x.classList.toggle("active",x===t));
-    curLibTab = t.dataset.libtab; renderStore();
+    curLibTab = t.dataset.libtab; storePage=1; renderStore();
   }));
-  $("storeSearch").addEventListener("input", renderStore);
+  $("storeSearch").addEventListener("input", ()=>{ storePage=1; renderStore(); });
   renderStore();
 
   // ===== 顶部页面切换 =====
@@ -1146,8 +1238,8 @@
   function renderHistory(){
     const el = $("historyList");
     if(synthHistory.length===0){ el.innerHTML = `<div class="history-empty">暂无合成记录</div>`; return; }
-    el.innerHTML = synthHistory.map(h=>`
-      <div class="history-item">
+    el.innerHTML = synthHistory.map((h,idx)=>`
+      <div class="history-item" data-idx="${idx}" title="右键单击可删除该记录">
         <div class="h-info">
           <div class="h-text">${escapeHtml(h.text)}</div>
           <div class="h-meta">${h.time} · ${h.dur} · ${h.fmt}</div>
@@ -1157,8 +1249,37 @@
     el.querySelectorAll(".h-dl").forEach((b,idx)=>{
       b.addEventListener("click",()=>showToastText("正在下载「"+synthHistory[idx].text+"」"+synthHistory[idx].fmt+" 音频…"));
     });
+    // 右键单击合成记录 -> 弹出删除菜单
+    el.querySelectorAll(".history-item").forEach(item=>{
+      item.addEventListener("contextmenu",(e)=>{
+        e.preventDefault();
+        openHistMenu(e.clientX, e.clientY, +item.dataset.idx);
+      });
+    });
   }
   renderHistory();
+
+  // 合成记录右键菜单
+  const histMenu = $("histMenu");
+  let histMenuIdx = -1;
+  function openHistMenu(x, y, idx){
+    histMenuIdx = idx;
+    histMenu.style.left = x + "px";
+    histMenu.style.top = y + "px";
+    histMenu.classList.add("show");
+  }
+  function closeHistMenu(){ histMenu.classList.remove("show"); histMenuIdx = -1; }
+  $("histDelete").addEventListener("click",()=>{
+    if(histMenuIdx>=0){
+      const name = synthHistory[histMenuIdx].text;
+      synthHistory.splice(histMenuIdx,1);
+      renderHistory();
+      showToastText("已删除合成记录");
+    }
+    closeHistMenu();
+  });
+  document.addEventListener("click", closeHistMenu);
+  document.addEventListener("scroll", closeHistMenu, true);
 
   // 用户菜单（退出）
   const userMenu = $("userMenu");
