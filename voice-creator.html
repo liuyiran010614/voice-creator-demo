@@ -155,8 +155,11 @@
     cursor:pointer; transition:all .2s; background:#fff; overflow:hidden;
   }
   .role-card:hover{border-color:var(--blue);background:var(--blue-light);}
-  .role-avatar{width:24px;height:24px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .role-avatar{width:24px;height:24px;border-radius:50%;background:var(--blue-light);
+    display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;overflow:hidden;}
+  .role-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+  .av-wrap{display:block;width:100%;height:100%;line-height:0;}
+  .av-wrap svg{display:block;width:100%;height:100%;}
   .role-name{font-size:12px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   .btn-primary{
@@ -206,6 +209,9 @@
   .step-btn:hover{background:#eef0f7;color:var(--blue);}
   .step-val{min-width:46px;text-align:center;font-size:13px;color:var(--t1);}
   .voice-settings .vs-fmt{width:92px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px;color:var(--t1);background:#fff;text-align:center;}
+  .vs-resynth-row{margin-top:12px;display:flex;justify-content:center;}
+  .vs-resynth-row.hidden{display:none;}
+  .vs-resynth{padding:6px 16px;font-size:13px;border-radius:8px;}
   .play-row{display:flex;align-items:center;gap:8px;}
   .play-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--blue);
     background:#fff;color:var(--blue);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -223,22 +229,37 @@
   .mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;
     align-items:center;justify-content:center;z-index:50;padding:16px;}
   .mask.show{display:flex;}
-  .modal{background:#fff;border-radius:12px;box-shadow:var(--shadow-modal);
-    width:100%;max-width:440px;padding:24px;}
-  .modal h3{font-size:17px;margin-bottom:18px;}
+  .modal{background:#fff;border-radius:16px;box-shadow:var(--shadow-modal);
+    width:100%;max-width:480px;padding:28px;}
+  .modal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .modal h3{font-size:18px;margin:0;}
+  .modal-close{border:none;background:none;font-size:18px;color:var(--t3);cursor:pointer;line-height:1;padding:4px;}
+  .modal-close:hover{color:var(--t1);}
   .field{margin-bottom:16px;}
   .field label{display:block;font-size:13px;color:var(--t2);margin-bottom:6px;}
-  .field .req{color:#F5483B;}
-  .avatar-pick{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;justify-items:center;}
-  .avatar-opt{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);
-    display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;background:#fff;}
+  .field .req{color:#F5483B;margin-right:2px;}
+
+  /* 头像区 */
+  .avatar-zone{display:flex;align-items:center;gap:18px;margin-bottom:22px;}
+  .avatar-preview{position:relative;width:84px;height:84px;border-radius:50%;flex-shrink:0;
+    background:var(--blue-light);display:flex;align-items:center;justify-content:center;
+    font-size:46px;overflow:hidden;}
+  .avatar-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+  .avatar-rec{flex:1;min-width:0;}
+  .avatar-rec-label{font-size:12px;color:var(--t3);margin-bottom:8px;}
+  .avatar-pick{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;}
+  .avatar-opt{width:40px;height:40px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;background:#fff;
+    transition:all .15s;overflow:hidden;}
+  .avatar-opt img{width:100%;height:100%;object-fit:cover;display:block;}
+  .avatar-opt:hover{border-color:var(--blue-light);}
   .avatar-opt.active{border-color:var(--blue);background:var(--blue-light);}
   select{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;background:#fff;color:var(--t1);}
   select:focus{outline:none;border-color:var(--blue);}
   .modal-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;}
-  .btn-cancel{background:#fff;color:var(--t2);border:1px solid var(--line);border-radius:8px;
-    padding:10px 20px;font-size:14px;cursor:pointer;}
-  .btn-cancel:hover{background:var(--bg);}
+  .btn-cancel{background:var(--bg);color:var(--t2);border:1px solid var(--line);border-radius:8px;
+    padding:10px 24px;font-size:14px;cursor:pointer;}
+  .btn-cancel:hover{background:#eef0f4;}
 
   .toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-20px);
     background:var(--success);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;
@@ -257,7 +278,8 @@
   .synth-back:hover{color:var(--blue);}
   .synth-voice{display:flex;align-items:center;gap:8px;}
   .synth-avatar{width:30px;height:30px;border-radius:50%;background:var(--blue-light);
-    display:flex;align-items:center;justify-content:center;font-size:16px;}
+    display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;}
+  .synth-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
   .synth-vname{font-size:15px;font-weight:600;}
   .synth-vtag{font-size:11px;color:var(--blue);background:var(--blue-light);border-radius:6px;padding:2px 8px;}
   .synth-body{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:24px 16px;
@@ -334,7 +356,8 @@
     display:flex;gap:12px;align-items:flex-start;transition:all .2s;}
   .store-card:hover{border-color:var(--blue-light);box-shadow:var(--shadow);}
   .store-av{width:44px;height:44px;border-radius:50%;background:var(--blue-light);
-    display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden;}
+  .store-av img{width:100%;height:100%;object-fit:cover;display:block;}
   .store-info{flex:1;min-width:0;}
   .store-name{font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px;}
   .store-tag{font-size:11px;color:var(--blue);background:var(--blue-light);border-radius:6px;padding:2px 8px;}
@@ -484,21 +507,28 @@
   <!-- 4. 音色登记弹窗 -->
   <div class="mask" id="mask">
     <div class="modal">
-      <h3 id="modalTitle">保存发音人</h3>
+      <div class="modal-top">
+        <h3 id="modalTitle">保存音色</h3>
+        <button class="modal-close" id="cancelBtn" type="button" aria-label="关闭">✕</button>
+      </div>
+
+      <!-- 头像区：大预览 + 推荐头像横排 -->
+      <div class="avatar-zone">
+        <div class="avatar-preview">
+          <span id="avatarBig">🧑</span>
+        </div>
+        <div class="avatar-rec">
+          <div class="avatar-rec-label">推荐音色头像</div>
+          <div class="avatar-pick" id="avatarPick"></div>
+        </div>
+      </div>
+
       <div class="field">
-        <label>发音人名称 <span class="req">*</span></label>
-        <input type="text" id="vName" placeholder="给这个发音人起个名字，如：智慧长者" />
+        <label><span class="req">*</span> 音色名称</label>
+        <input type="text" id="vName" placeholder="给这个音色起个名字，如：温暖奶奶" />
       </div>
       <div class="field">
-        <label>头像</label>
-        <div class="avatar-pick" id="avatarPick"></div>
-      </div>
-      <div class="field">
-        <label>音色描述</label>
-        <textarea id="vDesc" placeholder="音色描述（自动带入你的提示词，可修改）"></textarea>
-      </div>
-      <div class="field">
-        <label>性别</label>
+        <label><span class="req">*</span> 性别</label>
         <select id="vGender">
           <option value="男声">男声</option>
           <option value="女声">女声</option>
@@ -508,25 +538,58 @@
       <div class="field">
         <label>标签</label>
         <select id="vTag">
-          <option value="童声">童声</option>
-          <option value="旁白">旁白</option>
-          <option value="老年">老年</option>
-          <option value="青年">青年</option>
-          <option value="中年">中年</option>
-          <option value="解说">解说</option>
-          <option value="主播">主播</option>
-          <option value="客服">客服</option>
-          <option value="温柔">温柔</option>
-          <option value="磁性">磁性</option>
-          <option value="活泼">活泼</option>
-          <option value="沉稳">沉稳</option>
-          <option value="知性">知性</option>
-          <option value="搞怪">搞怪</option>
+          <option value="">（不选）</option>
+          <optgroup label="人群年龄">
+            <option value="童声">童声</option>
+            <option value="青年">青年</option>
+            <option value="中年">中年</option>
+            <option value="老年">老年</option>
+          </optgroup>
+          <optgroup label="风格情感">
+            <option value="温柔">温柔</option>
+            <option value="磁性">磁性</option>
+            <option value="活泼">活泼</option>
+            <option value="沉稳">沉稳</option>
+            <option value="知性">知性</option>
+            <option value="搞怪">搞怪</option>
+            <option value="甜美">甜美</option>
+            <option value="霸气">霸气</option>
+            <option value="高冷">高冷</option>
+            <option value="治愈">治愈</option>
+            <option value="热血">热血</option>
+            <option value="深情">深情</option>
+          </optgroup>
+          <optgroup label="小说题材">
+            <option value="玄幻">玄幻</option>
+            <option value="惊悚">惊悚</option>
+            <option value="都市">都市</option>
+            <option value="言情">言情</option>
+            <option value="武侠">武侠</option>
+            <option value="仙侠">仙侠</option>
+            <option value="悬疑">悬疑</option>
+            <option value="历史">历史</option>
+            <option value="科幻">科幻</option>
+            <option value="军事">军事</option>
+            <option value="校园">校园</option>
+            <option value="古言">古言</option>
+            <option value="盗墓">盗墓</option>
+            <option value="灵异">灵异</option>
+          </optgroup>
+          <optgroup label="应用场景">
+            <option value="旁白">旁白</option>
+            <option value="解说">解说</option>
+            <option value="主播">主播</option>
+            <option value="客服">客服</option>
+          </optgroup>
         </select>
       </div>
+      <div class="field">
+        <label>音色描述</label>
+        <textarea id="vDesc" placeholder="请输入音色描述（选填）"></textarea>
+      </div>
       <div class="modal-foot">
-        <button class="btn-cancel" id="cancelBtn">取消</button>
-        <button class="btn-primary" id="saveBtn">保存</button>
+        <button class="btn-cancel" id="cancelBtn2">取消</button>
+        <button class="btn-primary" id="saveBtn">确认</button>
       </div>
     </div>
   </div>
@@ -635,7 +698,67 @@
     {name:"搞笑大叔", emoji:"🤪", color:"#FFE0CC", prompt:"夸张诙谐的中年男声，节奏跳脱，适合段子和搞笑短视频配音。", text:"听我说，这事儿啊，你绝对想不到结局，简直离谱他妈给离谱开门！"}
   ];
 
-  const AVATARS = ["🧙","🎀","🎙️","🐿️","✨","🧔","👩‍🏫","🔥","🐱","🐰","🦊","🐻","🦁","🐼","👦","👧","🧑‍🎤","🦉"];
+  // ===== 头像系统（本地 SVG 绘制，不联网，按性别/肤色/年龄/胡子/眼镜区分）=====
+  // 角色/音色 -> 外观档案。skin: pale/light/tanned/brown/black
+  const AVATAR_PROFILE = {
+    // —— 公共音色库 ——
+    "温暖叙事":{g:"m",skin:"light",facial:"BeardLight"},
+    "知性女主播":{g:"f",skin:"light"},
+    "元气少女":{g:"f",skin:"pale",age:"young"},
+    "古风侠客":{g:"m",skin:"light"},
+    "新闻播报":{g:"m",skin:"light"},
+    "治愈电台":{g:"f",skin:"pale"},
+    "热血解说":{g:"m",skin:"tanned"},
+    "童话姐姐":{g:"f",skin:"light",age:"young"},
+    "磁性大叔":{g:"m",skin:"tanned",facial:"BeardMedium"},
+    "知性女声":{g:"f",skin:"light"},
+    "温暖大哥":{g:"m",skin:"light"},
+    "萌系少年":{g:"boy",skin:"pale",age:"young"},
+    "商务女声":{g:"f",skin:"light",glasses:true},
+    "搞笑大叔":{g:"m",skin:"tanned",facial:"BeardMedium"},
+    "沉稳旁白":{g:"m",skin:"light",facial:"BeardLight"},
+    "甜美客服":{g:"f",skin:"pale"},
+    "评书先生":{g:"m",skin:"light",facial:"BeardMedium"},
+    "清新少女":{g:"f",skin:"pale",age:"young"},
+    "威严法官":{g:"m",skin:"light"},
+    "温柔教师":{g:"f",skin:"light",glasses:true},
+    // —— 快捷角色 ——
+    "小动物":{g:"boy",skin:"pale",age:"young"},
+    "年迈智者":{g:"m",skin:"light",facial:"BeardMedium"},
+    "温柔女主播":{g:"f",skin:"light"},
+    "沉稳男旁白":{g:"m",skin:"light",facial:"BeardLight"},
+    "热血少女":{g:"f",skin:"pale"},
+    "知心电台":{g:"f",skin:"pale"},
+    "新闻主播":{g:"m",skin:"light"}
+  };
+  // 可选头像（弹窗里）：男女老幼+肤色搭配，浅肤为主，少量深肤
+  const AVATARS = [
+    {id:"A1",g:"f",skin:"light"},   {id:"A2",g:"m",skin:"light"},
+    {id:"A3",g:"f",skin:"pale"},    {id:"A4",g:"m",skin:"light",facial:"BeardLight"},
+    {id:"A5",g:"f",skin:"light",glasses:true}, {id:"A6",g:"boy",skin:"pale",age:"young"},
+    {id:"A7",g:"f",skin:"pale",age:"young"},   {id:"A8",g:"m",skin:"tanned",facial:"BeardMedium"},
+    {id:"A9",g:"f",skin:"light"},   {id:"A10",g:"m",skin:"light"},
+    {id:"A11",g:"f",skin:"brown"},  {id:"A12",g:"m",skin:"brown"},
+    {id:"A13",g:"f",skin:"light",age:"young"}, {id:"A14",g:"m",skin:"light",glasses:true},
+    {id:"A15",g:"f",skin:"pale"},   {id:"A16",g:"m",skin:"tanned"},
+    {id:"A17",g:"f",skin:"light"},  {id:"A18",g:"m",skin:"light",facial:"BeardLight"}
+  ];
+  // 弹窗可选头像 id -> 档案 映射（提前定义，供 avatarImg 使用）
+  const AVATAR_BY_ID = {};
+  AVATARS.forEach(a=>{ AVATAR_BY_ID[a.id] = a; });
+
+  // ===== 头像系统（DiceBear personas 在线头像，联网显示；线上访问可见）=====
+  function avatarUrl(seed){
+    return "https://api.dicebear.com/7.x/personas/svg?seed=" + encodeURIComponent(seed||"voice") +
+      "&radius=50&backgroundColor=ebf0ff,ffd9e8,d8e2ff,d9f0e3,ffe2c2";
+  }
+  function avatarImg(seedOrObj, cls){
+    let seed;
+    if(seedOrObj && typeof seedOrObj==="object") seed = seedOrObj.id;
+    else seed = seedOrObj;
+    return `<img class="${cls||""}" src="${avatarUrl(seed)}" alt="头像" loading="lazy" />`;
+  }
+  function buildAvatarSvg(){ return ""; } // 兼容占位（已不使用）
 
   // ===== 元素 =====
   const $ = id => document.getElementById(id);
@@ -644,7 +767,7 @@
   const confirmBtn = $("confirmBtn"), genBtn = $("genBtn"), resultPanel = $("resultPanel");
   const mask = $("mask"), avatarPick = $("avatarPick");
   let selectedVoice = null;
-  let selectedAvatar = AVATARS[0];
+  let selectedAvatar = AVATARS[0].id;
 
   // ===== 渲染推荐角色（每批 4 个一行，换一批与上批不重复）=====
   function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
@@ -662,7 +785,7 @@
     lastRoleNames = picks.map(r=>r.name);
     rolesEl.innerHTML = picks.map(r=>`
       <div class="role-card" data-prompt="${encodeURIComponent(r.prompt)}" data-text="${encodeURIComponent(r.text)}">
-        <div class="role-avatar" style="background:${r.color}">${r.emoji}</div>
+        <div class="role-avatar">${avatarImg(r.name)}</div>
         <div class="role-name">${r.name}</div>
       </div>`).join("");
     rolesEl.querySelectorAll(".role-card").forEach(card=>{
@@ -861,6 +984,9 @@
               <option value="pcm">PCM</option>
             </select>
           </div>
+          <div class="vs-resynth-row hidden">
+            <button class="btn-primary vs-resynth" type="button">重新合成</button>
+          </div>
         </div>
       </div>`).join("");
     resultsEl.classList.remove("hidden");
@@ -894,12 +1020,14 @@
       card.querySelector(".adjust-btn").addEventListener("click",()=>{
         settings.classList.toggle("hidden");
       });
-      // 参数调节：点 +/- 改数值（不用拖动）
+      // 参数调节：点 +/- 改数值（不用拖动）；调整后显示「重新合成」按钮
       const fmtVal={
         rate:v=>v.toFixed(1)+"x",
         vol:v=>Math.round(v)+"%",
         pitch:v=>(v>0?"+":"")+Math.round(v)
       };
+      const resynthRow = card.querySelector(".vs-resynth-row");
+      function showResynth(){ resynthRow.classList.remove("hidden"); }
       card.querySelectorAll(".stepper").forEach(sp=>{
         const key=sp.dataset.key;
         const min=+sp.dataset.min, max=+sp.dataset.max, step=+sp.dataset.step;
@@ -907,11 +1035,23 @@
         let cur=key==="rate"?1:(key==="vol"?100:0);
         const update=()=>valEl.textContent=fmtVal[key](cur);
         sp.querySelector(".step-down").addEventListener("click",()=>{
-          cur=Math.max(min,+(cur-step).toFixed(1)); update();
+          cur=Math.max(min,+(cur-step).toFixed(1)); update(); showResynth();
         });
         sp.querySelector(".step-up").addEventListener("click",()=>{
-          cur=Math.min(max,+(cur+step).toFixed(1)); update();
+          cur=Math.min(max,+(cur+step).toFixed(1)); update(); showResynth();
         });
+      });
+      // 格式变化也视为调整
+      card.querySelector(".vs-fmt").addEventListener("change", showResynth);
+      // 重新合成：按当前参数重新生成（演示用视觉反馈），并自动播放，按钮保留
+      card.querySelector(".vs-resynth").addEventListener("click",()=>{
+        const playBtn2 = card.querySelector(".play-btn");
+        const bar2 = card.querySelector(".progress span");
+        const timeEl2 = card.querySelector(".voice-time");
+        bar2.style.width="0"; playBtn2.textContent="▶";
+        showToastText(`「${names[i]}」已按新参数重新合成`);
+        // 自动播放重新合成后的音色
+        playDemo(playBtn2, bar2, dur.seconds, timeEl2);
       });
     });
   }
@@ -942,21 +1082,21 @@
   confirmBtn.addEventListener("click", ()=>openModal(null));
   function openModal(idx){
     editIndex = idx;
-    avatarPick.innerHTML = AVATARS.map((a,i)=>`<div class="avatar-opt" data-a="${a}">${a}</div>`).join("");
+    avatarPick.innerHTML = AVATARS.map(a=>`<div class="avatar-opt" data-a="${a.id}">${avatarImg(a)}</div>`).join("");
     let preset;
     if(idx===null){
-      preset = {name:"", avatar:AVATARS[0], desc:promptEl.value.trim(), gender:"男声", tag:"童声"};
-      $("modalTitle").textContent = "保存发音人";
+      preset = {name:"", avatar:AVATARS[0].id, desc:promptEl.value.trim(), gender:"男声", tag:""};
+      $("modalTitle").textContent = "保存音色";
     }else{
       const list = getList();
       preset = list[idx];
-      $("modalTitle").textContent = "编辑发音人";
+      $("modalTitle").textContent = "编辑音色";
     }
     $("vName").value = preset.name||"";
     $("vDesc").value = preset.desc||"";
     $("vGender").value = preset.gender||"男声";
-    $("vTag").value = preset.tag||"童声";
-    selectedAvatar = preset.avatar||AVATARS[0];
+    $("vTag").value = preset.tag||"";
+    selectedAvatar = preset.avatar||AVATARS[0].id;
     markAvatar(selectedAvatar);
     avatarPick.querySelectorAll(".avatar-opt").forEach(o=>{
       o.addEventListener("click",()=>{ selectedAvatar=o.dataset.a; markAvatar(selectedAvatar); });
@@ -964,9 +1104,11 @@
     mask.classList.add("show");
   }
   function markAvatar(a){
+    $("avatarBig").innerHTML = avatarImg(AVATAR_BY_ID[a] || a);
     avatarPick.querySelectorAll(".avatar-opt").forEach(x=>x.classList.toggle("active", x.dataset.a===a));
   }
   $("cancelBtn").addEventListener("click",()=>mask.classList.remove("show"));
+  $("cancelBtn2").addEventListener("click",()=>mask.classList.remove("show"));
   mask.addEventListener("click",e=>{ if(e.target===mask) mask.classList.remove("show"); });
 
   // ===== 数据读写 =====
@@ -978,26 +1120,26 @@
 
   // ===== 公共音色库（示例数据）=====
   const STORE_VOICES = [
-    {id:"s1", name:"温暖叙事", avatar:"🎙️", tag:"旁白", desc:"低沉稳重的男声，富有磁性，适合纪录片与有声书旁白。"},
-    {id:"s2", name:"知性女主播", avatar:"🎀", tag:"主播", desc:"知性优雅的女声，吐字清晰，适合资讯播报与知识讲解。"},
-    {id:"s3", name:"元气少女", avatar:"✨", tag:"活泼", desc:"明亮活泼的少女声，语速偏快，充满活力，适合短视频。"},
-    {id:"s4", name:"古风侠客", avatar:"⚔️", tag:"古风", desc:"清冷洒脱的男声，带一丝古韵，适合武侠与国风内容。"},
-    {id:"s5", name:"新闻播报", avatar:"📺", tag:"播音", desc:"标准专业播音腔，字正腔圆，适合正式新闻与信息播报。"},
-    {id:"s6", name:"治愈电台", avatar:"🌙", tag:"温柔", desc:"低柔舒缓的夜间电台女声，温柔慵懒，适合情感陪伴。"},
-    {id:"s7", name:"热血解说", avatar:"🔥", tag:"解说", desc:"激情澎湃的男声，爆发力强，适合赛事与游戏解说。"},
-    {id:"s8", name:"童话姐姐", avatar:"🧚", tag:"儿童", desc:"轻柔治愈的女声，语调温暖，适合睡前故事与儿童绘本。"},
-    {id:"s9", name:"磁性大叔", avatar:"🧔", tag:"磁性", desc:"成熟低沉的中年男声，慵懒随性，带一点烟嗓质感。"},
-    {id:"s10", name:"知性女声", avatar:"👩‍🏫", tag:"知性", desc:"知性优雅的成熟女声，语气从容，适合财经与人文讲解。"},
-    {id:"s11", name:"温暖大哥", avatar:"😎", tag:"口播", desc:"亲切随和的青年男声，真诚自然，适合生活分享和口播。"},
-    {id:"s12", name:"萌系少年", avatar:"🧒", tag:"少年", desc:"清亮活泼的少年音，干净有朝气，适合动漫与游戏配音。"},
-    {id:"s13", name:"商务女声", avatar:"💼", tag:"商务", desc:"干练利落的职场女声，专业稳重，适合企业宣传与产品介绍。"},
-    {id:"s14", name:"搞笑大叔", avatar:"🤪", tag:"搞怪", desc:"夸张诙谐的中年男声，节奏跳脱，适合段子与搞笑短视频。"},
-    {id:"s15", name:"沉稳旁白", avatar:"🎬", tag:"旁白", desc:"低沉沉稳的男声，节奏从容，适合影视纪录与广告旁白。"},
-    {id:"s16", name:"甜美客服", avatar:"☎️", tag:"客服", desc:"温柔甜美的女声，亲和有礼，适合智能客服与语音助手。"},
-    {id:"s17", name:"评书先生", avatar:"📖", tag:"评书", desc:"抑扬顿挫的男声，富有韵律，适合评书与传统故事讲述。"},
-    {id:"s18", name:"清新少女", avatar:"🌸", tag:"清新", desc:"清新自然的少女声，语调轻快，适合校园与生活类内容。"},
-    {id:"s19", name:"威严法官", avatar:"⚖️", tag:"权威", desc:"庄重有力的男声，带权威感，适合正式宣读与法务场景。"},
-    {id:"s20", name:"温柔教师", avatar:"👩‍🎓", tag:"教学", desc:"温和耐心的女声，吐字清晰，适合在线课程与教学讲解。"}
+    {id:"s1", name:"温暖叙事", avatar:"s1", tag:"旁白", desc:"低沉稳重的男声，富有磁性，适合纪录片与有声书旁白。"},
+    {id:"s2", name:"知性女主播", avatar:"s2", tag:"主播", desc:"知性优雅的女声，吐字清晰，适合资讯播报与知识讲解。"},
+    {id:"s3", name:"元气少女", avatar:"s3", tag:"活泼", desc:"明亮活泼的少女声，语速偏快，充满活力，适合短视频。"},
+    {id:"s4", name:"古风侠客", avatar:"s4", tag:"古风", desc:"清冷洒脱的男声，带一丝古韵，适合武侠与国风内容。"},
+    {id:"s5", name:"新闻播报", avatar:"s5", tag:"播音", desc:"标准专业播音腔，字正腔圆，适合正式新闻与信息播报。"},
+    {id:"s6", name:"治愈电台", avatar:"s6", tag:"温柔", desc:"低柔舒缓的夜间电台女声，温柔慵懒，适合情感陪伴。"},
+    {id:"s7", name:"热血解说", avatar:"s7", tag:"解说", desc:"激情澎湃的男声，爆发力强，适合赛事与游戏解说。"},
+    {id:"s8", name:"童话姐姐", avatar:"s8", tag:"儿童", desc:"轻柔治愈的女声，语调温暖，适合睡前故事与儿童绘本。"},
+    {id:"s9", name:"磁性大叔", avatar:"s9", tag:"磁性", desc:"成熟低沉的中年男声，慵懒随性，带一点烟嗓质感。"},
+    {id:"s10", name:"知性女声", avatar:"s10", tag:"知性", desc:"知性优雅的成熟女声，语气从容，适合财经与人文讲解。"},
+    {id:"s11", name:"温暖大哥", avatar:"s11", tag:"口播", desc:"亲切随和的青年男声，真诚自然，适合生活分享和口播。"},
+    {id:"s12", name:"萌系少年", avatar:"s12", tag:"少年", desc:"清亮活泼的少年音，干净有朝气，适合动漫与游戏配音。"},
+    {id:"s13", name:"商务女声", avatar:"s13", tag:"商务", desc:"干练利落的职场女声，专业稳重，适合企业宣传与产品介绍。"},
+    {id:"s14", name:"搞笑大叔", avatar:"s14", tag:"搞怪", desc:"夸张诙谐的中年男声，节奏跳脱，适合段子与搞笑短视频。"},
+    {id:"s15", name:"沉稳旁白", avatar:"s15", tag:"旁白", desc:"低沉沉稳的男声，节奏从容，适合影视纪录与广告旁白。"},
+    {id:"s16", name:"甜美客服", avatar:"s16", tag:"客服", desc:"温柔甜美的女声，亲和有礼，适合智能客服与语音助手。"},
+    {id:"s17", name:"评书先生", avatar:"s17", tag:"评书", desc:"抑扬顿挫的男声，富有韵律，适合评书与传统故事讲述。"},
+    {id:"s18", name:"清新少女", avatar:"s18", tag:"清新", desc:"清新自然的少女声，语调轻快，适合校园与生活类内容。"},
+    {id:"s19", name:"威严法官", avatar:"s19", tag:"权威", desc:"庄重有力的男声，带权威感，适合正式宣读与法务场景。"},
+    {id:"s20", name:"温柔教师", avatar:"s20", tag:"教学", desc:"温和耐心的女声，吐字清晰，适合在线课程与教学讲解。"}
   ];
 
   // ===== 音色库页：三个标签 =====
@@ -1063,7 +1205,7 @@
   function storeCardHtml(v, ctx){
     const fav = isFav(v.id);
     return `<div class="store-card" data-id="${v.id}">
-      <div class="store-av">${v.avatar||"🎙️"}</div>
+      <div class="store-av">${avatarImg(v.avatar||v.id||v.name)}</div>
       <div class="store-info">
         <div class="store-name">${escapeHtml(v.name)}<span class="store-tag">${escapeHtml(v.tag||"")}</span></div>
         <div class="store-desc">${escapeHtml(v.desc||"")}</div>
@@ -1076,7 +1218,7 @@
   }
   function mineCardHtml(v, i){
     return `<div class="store-card">
-      <div class="store-av">${v.avatar||"🎙️"}</div>
+      <div class="store-av">${avatarImg(v.avatar||v.name||("mine"+i))}</div>
       <div class="store-info">
         <div class="store-name">${escapeHtml(v.name)}<span class="store-tag">${escapeHtml(v.tag||"")}</span>${v.published?`<span class="lib-published">已发布</span>`:""}</div>
         <div class="store-desc">${escapeHtml(v.gender||"")} · ${(v.createdAt||"").slice(0,10)}创建<br>${escapeHtml(v.desc||"（无描述）")}</div>
@@ -1141,23 +1283,24 @@
 
   $("saveBtn").addEventListener("click",()=>{
     const name = $("vName").value.trim();
-    if(!name){ showToastText("请填写发音人名称"); return; }
+    if(!name){ showToastText("请填写音色名称"); return; }
+    if(!$("vGender").value){ showToastText("请选择性别"); return; }
     const list = getList();
     if(editIndex===null){
       list.push({
         name, avatar:selectedAvatar, desc:$("vDesc").value.trim(),
-        gender:$("vGender").value, tag:$("vTag").value,
+        gender:$("vGender").value, tag:$("vTag").value.trim(),
         voice:selectedVoice?selectedVoice.name:"", published:false,
         createdAt:new Date().toISOString()
       });
       setList(list);
       mask.classList.remove("show");
-      showToastText("发音人「"+name+"」保存成功");
+      showToastText("音色「"+name+"」保存成功");
       renderStore();
     }else{
       const r = list[editIndex];
       r.name=name; r.avatar=selectedAvatar; r.desc=$("vDesc").value.trim();
-      r.gender=$("vGender").value; r.tag=$("vTag").value;
+      r.gender=$("vGender").value; r.tag=$("vTag").value.trim();
       setList(list);
       mask.classList.remove("show");
       showToastText("已更新「"+name+"」");
@@ -1169,7 +1312,7 @@
   const synthPage = $("synthPage");
   let synthHistory = [];
   function openSynthPage(v){
-    $("synthAvatar").textContent = v.avatar||"🎙️";
+    $("synthAvatar").innerHTML = avatarImg(v.avatar||v.id||v.name);
     $("synthVName").textContent = v.name||"发音人";
     $("synthVTag").textContent = v.tag||"";
     $("synthText").value = "";
