@@ -530,8 +530,8 @@
       <div class="field">
         <label><span class="req">*</span> 性别</label>
         <select id="vGender">
-          <option value="男声">男声</option>
           <option value="女声">女声</option>
+          <option value="男声">男声</option>
           <option value="不区分">不区分</option>
         </select>
       </div>
@@ -1085,7 +1085,7 @@
     avatarPick.innerHTML = AVATARS.map(a=>`<div class="avatar-opt" data-a="${a.id}">${avatarImg(a)}</div>`).join("");
     let preset;
     if(idx===null){
-      preset = {name:"", avatar:AVATARS[0].id, desc:promptEl.value.trim(), gender:"男声", tag:""};
+      preset = {name:"", avatar:AVATARS[0].id, desc:promptEl.value.trim(), gender:"女声", tag:""};
       $("modalTitle").textContent = "保存音色";
     }else{
       const list = getList();
@@ -1094,7 +1094,7 @@
     }
     $("vName").value = preset.name||"";
     $("vDesc").value = preset.desc||"";
-    $("vGender").value = preset.gender||"男声";
+    $("vGender").value = preset.gender||"女声";
     $("vTag").value = preset.tag||"";
     selectedAvatar = preset.avatar||AVATARS[0].id;
     markAvatar(selectedAvatar);
