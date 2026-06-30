@@ -768,7 +768,7 @@
             <div class="synth-card-title">参数调节</div>
             <div class="param">
               <span class="param-label">语速</span>
-              <input type="range" id="rate" min="0" max="10" step="1" value="1" />
+              <input type="range" id="rate" min="0.5" max="1.5" step="0.1" value="1" />
               <span class="param-val" id="rateVal">1</span>
             </div>
             <div class="param">
@@ -1503,10 +1503,12 @@
 
   // ===== 顶部页面切换 =====
   function goPage(target){
-    if(typeof synthPage!=="undefined" && synthPage) synthPage.classList.remove("show"); // 关闭合成页覆盖层
+    var sp = document.getElementById("synthPage");
+    if(sp) sp.classList.remove("show"); // 关闭合成页覆盖层
     $("pageCreate").classList.toggle("active", target==="create");
     $("pageStore").classList.toggle("active", target==="store");
     $("navStoreBtn").style.display = target==="store" ? "none" : "";
+    $("backHome").style.display = "";   // 恢复音色库返回按钮显示
     if(target==="store") renderStore();
     window.scrollTo(0,0);
   }
@@ -1570,20 +1572,29 @@
   // ===== 合成页（“使用”进入）=====
   const synthPage = $("synthPage");
   let synthHistory = [];
+  let synthCurrentVoiceName = "发音人"; // 当前打开的发音人名称
   function openSynthPage(v){
+    synthCurrentVoiceName = v.name || "发音人";
     $("synthAvatar").innerHTML = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||v.id));
-    $("synthVName").textContent = v.name||"发音人";
+    $("synthVName").textContent = synthCurrentVoiceName;
     $("synthVTag").textContent = v.tag||"";
     $("synthText").value = "";
     $("uploadName").textContent = "支持 txt 格式，上传后内容显示在此";
     $("synthOutput").classList.add("hidden");
     switchTab("input");
     $("navStoreBtn").style.display = "none";  // 合成页不显示音色库按钮
+    $("backHome").style.display = "none";     // 隐藏底层音色库的返回按钮，避免和合成页返回按钮重叠误触
     synthPage.classList.add("show");
   }
-  $("synthBack").addEventListener("click",()=>{
-    synthPage.classList.remove("show");
-    goPage("store");   // 返回到音色库页面（左上角显示返回，不显示音色库按钮）
+  // 用事件委托绑定，避免绑定时机/脚本中断导致失效
+  document.addEventListener("click",function(e){
+    if(e.target.closest && e.target.closest("#synthBack")){
+      e.preventDefault();
+      e.stopPropagation();
+      try{
+        goPage("store");
+      }catch(err){ console.error("synthBack error:", err); }
+    }
   });
 
   function switchTab(tab){
@@ -1610,7 +1621,7 @@
   });
 
   // 参数联动显示
-  $("rate").addEventListener("input",e=>$("rateVal").textContent = e.target.value);
+  $("rate").addEventListener("input",e=>$("rateVal").textContent = parseFloat(e.target.value).toFixed(1));
   $("vol").addEventListener("input",e=>$("volVal").textContent = e.target.value);
   $("pitch").addEventListener("input",e=>$("pitchVal").textContent = e.target.value);
 
@@ -1624,9 +1635,12 @@
     const playBtn=$("synthPlay"), bar=out.querySelector(".progress span"), timeEl=$("synthTime");
     bar.style.width="0"; timeEl.textContent=fmtTime(dur.seconds); timeEl.dataset.total=dur.seconds;
     showToastText("合成完成，时长约 "+fmtTime(dur.seconds));
-    // 记录
+    // 记录：以音色名称为文件名，同名加序号
+    const voiceName = synthCurrentVoiceName;
+    const sameCount = synthHistory.filter(h => h.voiceName === voiceName).length;
+    const label = sameCount === 0 ? voiceName : voiceName + "（" + (sameCount + 1) + "）";
     synthHistory.unshift({
-      text: txt.length>20?txt.slice(0,20)+"…":txt,
+      voiceName, label,
       fmt: $("fmt").value.toUpperCase(), dur: fmtTime(dur.seconds),
       time: new Date().toLocaleTimeString().slice(0,5)
     });
@@ -1646,13 +1660,13 @@
     el.innerHTML = synthHistory.map((h,idx)=>`
       <div class="history-item" data-idx="${idx}" title="右键单击可删除该记录">
         <div class="h-info">
-          <div class="h-text">${escapeHtml(h.text)}</div>
+          <div class="h-text">${escapeHtml(h.label)}</div>
           <div class="h-meta">${h.time} · ${h.dur} · ${h.fmt}</div>
         </div>
         <button class="h-dl">下载</button>
       </div>`).join("");
     el.querySelectorAll(".h-dl").forEach((b,idx)=>{
-      b.addEventListener("click",()=>showToastText("正在下载「"+synthHistory[idx].text+"」"+synthHistory[idx].fmt+" 音频…"));
+      b.addEventListener("click",()=>showToastText("正在下载「"+synthHistory[idx].label+"」"+synthHistory[idx].fmt+" 音频…"));
     });
     // 右键单击合成记录 -> 弹出删除菜单
     el.querySelectorAll(".history-item").forEach(item=>{
