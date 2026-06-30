@@ -1503,6 +1503,7 @@
 
   // ===== 顶部页面切换 =====
   function goPage(target){
+    if(typeof synthPage!=="undefined" && synthPage) synthPage.classList.remove("show"); // 关闭合成页覆盖层
     $("pageCreate").classList.toggle("active", target==="create");
     $("pageStore").classList.toggle("active", target==="store");
     $("navStoreBtn").style.display = target==="store" ? "none" : "";
