@@ -1577,9 +1577,13 @@
     $("uploadName").textContent = "支持 txt 格式，上传后内容显示在此";
     $("synthOutput").classList.add("hidden");
     switchTab("input");
+    $("navStoreBtn").style.display = "none";  // 合成页不显示音色库按钮
     synthPage.classList.add("show");
   }
-  $("synthBack").addEventListener("click",()=>synthPage.classList.remove("show"));
+  $("synthBack").addEventListener("click",()=>{
+    synthPage.classList.remove("show");
+    goPage("store");   // 返回到音色库页面（左上角显示返回，不显示音色库按钮）
+  });
 
   function switchTab(tab){
     document.querySelectorAll(".synth-tab").forEach(t=>t.classList.toggle("active", t.dataset.tab===tab));
