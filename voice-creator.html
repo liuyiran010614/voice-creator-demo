@@ -1478,7 +1478,7 @@
     const pager = $("storePager");
     if(cards.length===0){
       const tip = curLibTab==="mine" ? "还没有保存的音色，去首页生成并保存一个吧～"
-                : curLibTab==="fav" ? "还没有收藏的音色，在「公共音色库」里点收藏试试～"
+                : curLibTab==="fav" ? "还没有收藏的音色，在「音色库」里点收藏试试～"
                 : (q?"没有找到匹配的音色":"暂无音色");
       storeGrid.innerHTML = `<div class="store-empty">${tip}</div>`;
       pager.classList.add("hidden"); pager.innerHTML="";
