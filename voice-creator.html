@@ -379,7 +379,7 @@
   .synth-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;}
   .synth-avatar .emoji-face{font-size:30px;line-height:1;}
   .synth-vname{font-size:16px;font-weight:600;}
-  .synth-vtag{font-size:11px;color:var(--blue);background:var(--blue-light);border-radius:6px;padding:2px 8px;}
+  .synth-vtag{font-size:11px;display:inline-flex;align-items:center;gap:4px;}
   .synth-body{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;align-items:start;}
   @media (max-width:860px){.synth-body{grid-template-columns:1fr;}}
   .synth-main,.synth-card{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:20px;}
@@ -475,9 +475,9 @@
   .lib-tab.active{color:var(--blue);font-weight:600;border-bottom-color:var(--blue);}
   .store-toolbar{display:flex;align-items:stretch;gap:12px;margin-bottom:16px;flex-wrap:nowrap;overflow-x:auto;}
 .store-search{flex:0 1 auto;min-width:0;width:50%;border:1px solid var(--line);border-radius:8px;
-  padding:5px 8px;font-size:13px;line-height:1.4;background:#fff;box-sizing:border-box;}
+  padding:3px 8px;font-size:13px;line-height:1.4;background:#fff;box-sizing:border-box;}
   .store-search:focus{outline:none;border-color:var(--blue);}
-.store-filter{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:13px;line-height:1.4;
+.store-filter{border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:13px;line-height:1.4;
   background:#fff;color:var(--t2);cursor:pointer;white-space:nowrap;flex:1 1 auto;min-width:0;max-width:150px;box-sizing:border-box;}
   .store-filter:focus{outline:none;border-color:var(--blue);}
   .store-grid{display:flex;flex-direction:column;gap:10px;}
@@ -647,7 +647,7 @@
         <button class="lib-tab" data-libtab="fav">我的收藏</button>
       </div>
       <div class="store-toolbar">
-        <input type="text" id="storeSearch" class="store-search" placeholder="搜索音色名称…" />
+        <input type="text" id="storeSearch" class="store-search" placeholder="搜索音色名称或音色描述…" />
         <select class="store-filter" id="filterGender">
           <option value="">性别：全部</option>
           <option value="女声">女声</option>
@@ -1431,7 +1431,7 @@
     const fPub = $("filterPub").value;
     // 只有"我的音色库"才显示"是否已发布"筛选框
     $("filterPub").style.display = curLibTab==="mine" ? "" : "none";
-    const matchText = v => !q || (v.name||"").toLowerCase().includes(q);
+    const matchText = v => !q || (v.name||"").toLowerCase().includes(q) || (v.desc||"").toLowerCase().includes(q);
     const matchGender = v => !fGender || (v.gender||"")=== fGender;
     const matchAge = v => !fAge || (v.age||"")=== fAge;
     const matchPub = v => !fPub || (fPub==="1" ? v.published : !v.published);
@@ -1457,7 +1457,7 @@
 
     const pager = $("storePager");
     if(cards.length===0){
-      const tip = curLibTab==="mine" ? "还没有保存的音色，去音色创造页生成并保存一个吧～"
+      const tip = curLibTab==="mine" ? "还没有保存的音色，去首页生成并保存一个吧～"
                 : curLibTab==="fav" ? "还没有收藏的音色，在「公共音色库」里点收藏试试～"
                 : (q?"没有找到匹配的音色":"暂无音色");
       storeGrid.innerHTML = `<div class="store-empty">${tip}</div>`;
@@ -1510,6 +1510,7 @@
     </div>`;
   }
 function mineCardHtml(v, i){
+  const fav = isFav(v.id||("mine"+i));
   return `<div class="store-card">
       <div class="store-av">${avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||("mine"+i)))}</div>
       <div class="store-info">
@@ -1518,6 +1519,7 @@ function mineCardHtml(v, i){
       </div>
       <div class="store-acts">
         <button class="store-act" data-mine-use="${i}">使用</button>
+        <button class="store-act fav ${fav?"on":""}" data-mine-fav="${i}${v.id?"|"+v.id:""}">${fav?"已收藏":"收藏"}</button>
         <button class="store-act" data-mine-edit="${i}">编辑</button>
         ${v.published
           ? `<button class="store-act pub-cancel" data-mine-pub="${i}">取消发布</button>`
@@ -1536,6 +1538,13 @@ function mineCardHtml(v, i){
       toggleFav(b.dataset.fav); renderStore();
     }));
     storeGrid.querySelectorAll("[data-mine-use]").forEach(b=>b.addEventListener("click",()=>openSynthPage(getList()[+b.dataset.mineUse])));
+    storeGrid.querySelectorAll("[data-mine-fav]").forEach(b=>b.addEventListener("click",()=>{
+      const parts = b.dataset.mineFav.split("|");
+      const i = +parts[0];
+      const v = getList()[i];
+      const id = (v&&v.id) || ("mine"+i);
+      toggleFav(id); renderStore();
+    }));
     storeGrid.querySelectorAll("[data-mine-edit]").forEach(b=>b.addEventListener("click",()=>openModal(+b.dataset.mineEdit)));
     storeGrid.querySelectorAll("[data-mine-pub]").forEach(b=>b.addEventListener("click",()=>{
       const i=+b.dataset.minePub; const list=getList();
@@ -1703,7 +1712,7 @@ function mineCardHtml(v, i){
     synthCurrentVoiceName = v.name || "发音人";
     $("synthAvatar").innerHTML = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||v.id));
     $("synthVName").textContent = synthCurrentVoiceName + (synthPickerSelected.length>1?" 等"+synthPickerSelected.length+"人":"");
-    $("synthVTag").textContent = v.tag||"";
+    $("synthVTag").innerHTML = genderTagHtml(v.gender)+ageTagHtml(v.age);
     $("synthPicker").classList.add("hidden");
     $("synthChangeBtn").textContent = "换发音人";
     showToastText("已选择 "+synthPickerSelected.length+" 个发音人");
@@ -1716,7 +1725,7 @@ function mineCardHtml(v, i){
     $("synthChangeBtn").textContent = "换发音人";
     $("synthAvatar").innerHTML = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||v.id));
     $("synthVName").textContent = synthCurrentVoiceName;
-    $("synthVTag").textContent = v.tag||"";
+    $("synthVTag").innerHTML = genderTagHtml(v.gender)+ageTagHtml(v.age);
     $("synthText").value = "";
     $("uploadName").textContent = "支持 txt 格式，上传后内容显示在此";
     $("synthOutput").classList.add("hidden");
