@@ -297,7 +297,7 @@
   .avatar-preview .emoji-face{font-size:60px;line-height:1;}
   .avatar-rec{flex:1;min-width:0;}
   .avatar-rec-label{font-size:12px;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
-  .avatar-pick{display:flex;flex-wrap:wrap;gap:8px;max-height:104px;overflow-y:auto;padding:2px 2px 4px;align-content:flex-start;}
+  .avatar-pick{display:flex;flex-wrap:wrap;gap:8px;max-height:104px;overflow-y:scroll;padding:2px 2px 4px;align-content:flex-start;}
   .avatar-opt{width:44px;height:44px;border-radius:50%;border:2px solid transparent;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;font-size:30px;cursor:pointer;background:transparent;
     transition:all .15s;overflow:hidden;}
@@ -346,9 +346,12 @@
   /* 合成页 */
   .synth-page{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;overflow:auto;}
   .synth-page.show{display:block;}
-  .synth-wrap{max-width:1100px;width:100%;margin:0 auto;padding:80px 16px 40px;}
+  .synth-wrap{max-width:1100px;width:100%;margin:0 auto;padding:80px 16px 40px;
+    display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;align-items:start;}
+  @media (max-width:860px){.synth-wrap{grid-template-columns:1fr;}}
+  .synth-left{display:flex;flex-direction:column;gap:12px;min-width:0;}
   .synth-voice{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;
-    box-shadow:var(--shadow);padding:14px 18px;margin-bottom:12px;flex-wrap:wrap;}
+    box-shadow:var(--shadow);padding:14px 18px;flex-wrap:wrap;}
   .synth-avatar{flex-shrink:0;}
   .synth-vinfo{flex:1;min-width:0;display:flex;align-items:center;gap:8px;}
   .synth-change-btn{border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:8px;
@@ -380,17 +383,19 @@
   .synth-avatar .emoji-face{font-size:30px;line-height:1;}
   .synth-vname{font-size:16px;font-weight:600;}
   .synth-vtag{font-size:11px;display:inline-flex;align-items:center;gap:4px;}
-  .synth-body{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;align-items:start;}
-  @media (max-width:860px){.synth-body{grid-template-columns:1fr;}}
+  .synth-body{display:contents;}
+  @media (max-width:860px){.synth-body{display:contents;}}
   .synth-main,.synth-card{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:20px;}
-  .synth-side{display:flex;flex-direction:column;gap:20px;}
+  .synth-side{display:flex;flex-direction:column;gap:20px;position:sticky;top:80px;}
+  .synth-main{display:flex;flex-direction:column;}
+  .synth-main .synth-tabpane{flex:1;}
   .synth-tabs{display:flex;gap:8px;margin-bottom:14px;border-bottom:1px solid var(--line);}
   .synth-tab{border:none;background:none;cursor:pointer;font-size:14px;color:var(--t2);
     padding:8px 4px;border-bottom:2px solid transparent;margin-bottom:-1px;}
   .synth-tab.active{color:var(--blue);font-weight:600;border-bottom-color:var(--blue);}
-  #synthText{min-height:200px;}
+  #synthText{min-height:260px;}
   .upload-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-    border:2px dashed var(--line);border-radius:10px;padding:48px 16px;cursor:pointer;color:var(--t2);
+    border:2px dashed var(--line);border-radius:10px;padding:62px 16px;cursor:pointer;color:var(--t2);
     font-size:14px;text-align:center;transition:all .2s;}
   .upload-box:hover{border-color:var(--blue);background:var(--blue-light);}
   .upload-icon{font-size:34px;}
@@ -421,7 +426,10 @@
   .dl-icon{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;
     color:var(--t2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
   .dl-icon:hover{border-color:var(--blue);color:var(--blue);}
-  .history-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto;}
+  .history-list{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;}
+.history-search-bar{margin-bottom:10px;}
+.history-search{width:100%;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:13px;box-sizing:border-box;background:#fff;}
+.history-search:focus{outline:none;border-color:var(--blue);}
   .history-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:default;}
   .history-item .h-info{flex:1;min-width:0;}
   .history-item .h-text{font-size:13px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -749,92 +757,103 @@
       返回
     </button>
     <div class="synth-wrap">
-      <!-- 发音人信息 + 换发音人（合并在同一卡片内）-->
-      <div class="synth-voice" id="synthVoiceCard">
-        <span class="synth-avatar" id="synthAvatar">🎙️</span>
-        <div class="synth-vinfo">
-          <span class="synth-vname" id="synthVName">发音人</span>
-          <span class="synth-vtag" id="synthVTag"></span>
-        </div>
-        <button class="synth-change-btn" id="synthChangeBtn" type="button">换发音人</button>
-        <!-- 换发音人面板（展开在卡片内部） -->
-        <div class="synth-picker hidden" id="synthPicker">
-          <div class="synth-picker-head">
-            <input type="text" class="synth-picker-search" id="synthPickerSearch" placeholder="搜索发音人…" />
-            <span class="synth-picker-tip">点击选中（可多选）</span>
+      <div class="synth-left">
+        <!-- 发音人信息 + 换发音人（合并在同一卡片内）-->
+        <div class="synth-voice" id="synthVoiceCard">
+          <span class="synth-avatar" id="synthAvatar">🎙️</span>
+          <div class="synth-vinfo">
+            <span class="synth-vname" id="synthVName">发音人</span>
+            <span class="synth-vtag" id="synthVTag"></span>
           </div>
-          <div class="synth-picker-list" id="synthPickerList"></div>
-          <div class="synth-picker-foot">
-            <span id="synthPickerCount">已选 0 个</span>
-            <button class="btn-primary" id="synthPickerConfirm" type="button">确认</button>
+          <button class="synth-change-btn" id="synthChangeBtn" type="button">换发音人</button>
+          <!-- 换发音人面板（展开在卡片内部） -->
+          <div class="synth-picker hidden" id="synthPicker">
+            <div class="synth-picker-head">
+              <input type="text" class="synth-picker-search" id="synthPickerSearch" placeholder="搜索发音人…" />
+              <span class="synth-picker-tip">点击选中（可多选）</span>
+            </div>
+            <div class="synth-picker-list" id="synthPickerList"></div>
+            <div class="synth-picker-foot">
+              <span id="synthPickerCount">已选 0 个</span>
+              <button class="btn-primary" id="synthPickerConfirm" type="button">确认</button>
+            </div>
+          </div>
+        </div>
+        <div class="synth-body">
+          <!-- 左：文本输入 -->
+          <div class="synth-main">
+            <div class="synth-tabs">
+              <button class="synth-tab active" data-tab="input">文字输入</button>
+              <button class="synth-tab" data-tab="upload">文本上传</button>
+            </div>
+            <div class="synth-tabpane" id="paneInput">
+              <textarea id="synthText" maxlength="500" placeholder="在此输入或粘贴要合成的文本…"></textarea>
+              <div class="ta-foot">
+                <span class="ta-count" id="synthTextCount">0/500 字符</span>
+                <button class="ta-clear" id="synthTextClear" type="button" title="清空">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="synth-tabpane hidden" id="paneUpload">
+              <label class="upload-box" id="uploadBox">
+                <input type="file" id="fileInput" accept=".txt" hidden />
+                <div class="upload-icon">📄</div>
+                <div>点击上传文本文件（.txt）</div>
+                <div class="upload-sub" id="uploadName">支持 txt 格式，上传后内容显示在此</div>
+              </label>
+            </div>
+            <div class="synth-actions">
+              <button class="btn-primary" id="synthRun">开始合成</button>
+            </div>
+            <div class="synth-output hidden" id="synthOutput">
+              <button class="play-btn" id="synthPlay" type="button">▶</button>
+              <span class="voice-time" id="synthTime" data-total="0">00:00</span>
+              <div class="progress" id="synthProgress"><span></span><i class="progress-knob"></i></div>
+              <button class="dl-icon" id="synthDownload" type="button" title="下载音频">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-      <div class="synth-body">
-        <!-- 左：文本输入 -->
-        <div class="synth-main">
-          <div class="synth-tabs">
-            <button class="synth-tab active" data-tab="input">文字输入</button>
-            <button class="synth-tab" data-tab="upload">文本上传</button>
+
+      <!-- 右：参数 + 合成记录 -->
+      <div class="synth-side">
+        <div class="synth-card">
+          <div class="synth-card-title">参数调节</div>
+          <div class="param">
+            <span class="param-label">语速</span>
+            <input type="range" id="rate" min="0.5" max="1.5" step="0.1" value="1" />
+            <span class="param-val" id="rateVal">1</span>
           </div>
-          <div class="synth-tabpane" id="paneInput">
-            <textarea id="synthText" placeholder="在此输入或粘贴要合成的文本…"></textarea>
+          <div class="param">
+            <span class="param-label">音量</span>
+            <input type="range" id="vol" min="0" max="10" step="1" value="5" />
+            <span class="param-val" id="volVal">5</span>
           </div>
-          <div class="synth-tabpane hidden" id="paneUpload">
-            <label class="upload-box" id="uploadBox">
-              <input type="file" id="fileInput" accept=".txt" hidden />
-              <div class="upload-icon">📄</div>
-              <div>点击上传文本文件（.txt）</div>
-              <div class="upload-sub" id="uploadName">支持 txt 格式，上传后内容显示在此</div>
-            </label>
+          <div class="param">
+            <span class="param-label">音调</span>
+            <input type="range" id="pitch" min="0" max="10" step="1" value="5" />
+            <span class="param-val" id="pitchVal">5</span>
           </div>
-          <div class="synth-actions">
-            <button class="btn-primary" id="synthRun">开始合成</button>
-          </div>
-          <div class="synth-output hidden" id="synthOutput">
-            <button class="play-btn" id="synthPlay" type="button">▶</button>
-            <span class="voice-time" id="synthTime" data-total="0">00:00</span>
-            <div class="progress" id="synthProgress"><span></span><i class="progress-knob"></i></div>
-            <button class="dl-icon" id="synthDownload" type="button" title="下载音频">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            </button>
+          <div class="param param-fmt">
+            <span class="param-label">格式</span>
+            <select id="fmt">
+              <option value="wav">WAV</option>
+              <option value="mp3">MP3</option>
+              <option value="pcm">PCM</option>
+              <option value="pcm-8k">PCM-8K</option>
+              <option value="opus">OPUS</option>
+            </select>
           </div>
         </div>
-
-        <!-- 右：参数 + 合成记录 -->
-        <div class="synth-side">
-          <div class="synth-card">
-            <div class="synth-card-title">参数调节</div>
-            <div class="param">
-              <span class="param-label">语速</span>
-              <input type="range" id="rate" min="0.5" max="1.5" step="0.1" value="1" />
-              <span class="param-val" id="rateVal">1</span>
-            </div>
-            <div class="param">
-              <span class="param-label">音量</span>
-              <input type="range" id="vol" min="0" max="10" step="1" value="5" />
-              <span class="param-val" id="volVal">5</span>
-            </div>
-            <div class="param">
-              <span class="param-label">音调</span>
-              <input type="range" id="pitch" min="0" max="10" step="1" value="5" />
-              <span class="param-val" id="pitchVal">5</span>
-            </div>
-            <div class="param param-fmt">
-              <span class="param-label">格式</span>
-              <select id="fmt">
-                <option value="wav">WAV</option>
-                <option value="mp3">MP3</option>
-                <option value="pcm">PCM</option>
-                <option value="pcm-8k">PCM-8K</option>
-                <option value="opus">OPUS</option>
-              </select>
-            </div>
+        <div class="synth-card">
+          <div class="synth-card-title">合成记录</div>
+          <div class="history-search-bar">
+            <input type="text" id="historySearch" class="history-search" placeholder="搜索发音人名称…" />
           </div>
-          <div class="synth-card">
-            <div class="synth-card-title">合成记录</div>
-            <div class="history-list" id="historyList"></div>
-          </div>
+          <div class="history-list" id="historyList"></div>
         </div>
       </div>
     </div>
@@ -1093,6 +1112,7 @@
   }
   bindCounter("prompt","promptCount","promptClear",200);
   bindCounter("text","textCount","textClear",200);
+  bindCounter("synthText","synthTextCount","synthTextClear",500);
 
   // ===== 自动生成试听文本（依据音色描述匹配风格）=====
   // 按关键词匹配风格，每种风格有多条候选文本，命中后随机取一条
@@ -1645,7 +1665,7 @@ function mineCardHtml(v, i){
 
   // ===== 合成页（“使用”进入）=====
   const synthPage = $("synthPage");
-  let synthHistory = [];
+  let synthHistory = JSON.parse(localStorage.getItem("synth_history")||"[]");
   let synthCurrentVoiceName = "发音人";
   let synthPickerSelected = []; // 换发音人多选列表
 
@@ -1712,7 +1732,7 @@ function mineCardHtml(v, i){
     synthCurrentVoiceName = v.name || "发音人";
     $("synthAvatar").innerHTML = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||v.id));
     $("synthVName").textContent = synthCurrentVoiceName + (synthPickerSelected.length>1?" 等"+synthPickerSelected.length+"人":"");
-    $("synthVTag").innerHTML = genderTagHtml(v.gender)+ageTagHtml(v.age);
+    $("synthVTag").innerHTML = synthPickerSelected.length > 1 ? "" : genderTagHtml(v.gender)+ageTagHtml(v.age);
     $("synthPicker").classList.add("hidden");
     $("synthChangeBtn").textContent = "换发音人";
     showToastText("已选择 "+synthPickerSelected.length+" 个发音人");
@@ -1782,16 +1802,23 @@ function mineCardHtml(v, i){
     out.classList.remove("hidden");
     const playBtn=$("synthPlay"), bar=out.querySelector(".progress span"), timeEl=$("synthTime");
     bar.style.width="0"; timeEl.textContent=fmtTime(dur.seconds); timeEl.dataset.total=dur.seconds;
-    showToastText("合成完成，时长约 "+fmtTime(dur.seconds));
-    // 记录：以音色名称为文件名，同名加序号
-    const voiceName = synthCurrentVoiceName;
-    const sameCount = synthHistory.filter(h => h.voiceName === voiceName).length;
-    const label = sameCount === 0 ? voiceName : voiceName + "（" + (sameCount + 1) + "）";
-    synthHistory.unshift({
-      voiceName, label,
-      fmt: $("fmt").value.toUpperCase(), dur: fmtTime(dur.seconds),
-      time: new Date().toLocaleTimeString().slice(0,5)
-    });
+    // 多发音人：每个发音人生成一条记录
+    const voices = synthPickerSelected.length > 0 ? synthPickerSelected : [{name: synthCurrentVoiceName}];
+    const now = new Date();
+      const dateStr = now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+      const timeStr = now.toLocaleTimeString().slice(0,5);
+      voices.forEach(v => {
+        const voiceName = v.name || synthCurrentVoiceName;
+        const sameCount = synthHistory.filter(h => h.voiceName === voiceName).length;
+        const label = sameCount === 0 ? voiceName : voiceName + "（" + (sameCount + 1) + "）";
+        synthHistory.unshift({
+          voiceName, label,
+          fmt: $("fmt").value.toUpperCase(), dur: fmtTime(dur.seconds),
+          date: dateStr, time: timeStr
+        });
+      });
+      saveHistory();
+    showToastText("合成完成，共 "+voices.length+" 份，时长约 "+fmtTime(dur.seconds));
     renderHistory();
     // 绑定播放
     playBtn.onclick = ()=>playDemo(playBtn,bar,dur.seconds,timeEl);
@@ -1802,19 +1829,23 @@ function mineCardHtml(v, i){
     showToastText("正在下载 "+$("fmt").value.toUpperCase()+" 音频…");
   });
 
-  function renderHistory(){
+  function saveHistory(){ localStorage.setItem("synth_history", JSON.stringify(synthHistory)); }
+  function renderHistory(filterQ){
     const el = $("historyList");
-    if(synthHistory.length===0){ el.innerHTML = `<div class="history-empty">暂无合成记录</div>`; return; }
-    el.innerHTML = synthHistory.map((h,idx)=>`
-      <div class="history-item" data-idx="${idx}" title="右键单击可删除该记录">
+    const q = ($("historySearch")?$("historySearch").value||"":"").toLowerCase().trim();
+    const list = q ? synthHistory.filter(h=>(h.voiceName||"").toLowerCase().includes(q)) : synthHistory;
+    if(list.length===0){ el.innerHTML = `<div class="history-empty">${synthHistory.length===0?"暂无合成记录":"无匹配记录"}</div>`; return; }
+    el.innerHTML = list.map((h,idx)=>`
+      <div class="history-item" data-idx="${synthHistory.indexOf(h)}" title="右键单击可删除该记录">
         <div class="h-info">
           <div class="h-text">${escapeHtml(h.label)}</div>
-          <div class="h-meta">${h.time} · ${h.dur} · ${h.fmt}</div>
+          <div class="h-meta">${h.date||""} ${h.time} · ${h.dur} · ${h.fmt}</div>
         </div>
         <button class="h-dl">下载</button>
       </div>`).join("");
-    el.querySelectorAll(".h-dl").forEach((b,idx)=>{
-      b.addEventListener("click",()=>showToastText("正在下载「"+synthHistory[idx].label+"」"+synthHistory[idx].fmt+" 音频…"));
+    el.querySelectorAll(".h-dl").forEach((b)=>{
+      const realIdx = +b.closest(".history-item").dataset.idx;
+      b.addEventListener("click",()=>showToastText("正在下载「"+synthHistory[realIdx].label+"」"+synthHistory[realIdx].fmt+" 音频…"));
     });
     // 右键单击合成记录 -> 弹出删除菜单
     el.querySelectorAll(".history-item").forEach(item=>{
@@ -1825,6 +1856,7 @@ function mineCardHtml(v, i){
     });
   }
   renderHistory();
+  $("historySearch").addEventListener("input",()=>renderHistory());
 
   // 合成记录右键菜单
   const histMenu = $("histMenu");
@@ -1840,6 +1872,7 @@ function mineCardHtml(v, i){
     if(histMenuIdx>=0){
       const name = synthHistory[histMenuIdx].text;
       synthHistory.splice(histMenuIdx,1);
+      saveHistory();
       renderHistory();
       showToastText("已删除合成记录");
     }
