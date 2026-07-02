@@ -263,7 +263,12 @@
     background:#1f2024;color:#fff;font-size:13px;
     display:flex;align-items:center;justify-content:center;transition:all .2s;}
   .vc-play:hover{background:#000;}
-  .vc-name{font-size:16px;font-weight:600;color:var(--t1);}
+  .vc-name{font-size:16px;font-weight:600;color:var(--t1);margin-top:3px;}
+  .vc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+  .vc-progress-row{display:flex;align-items:center;gap:8px;}
+  .vc-progress{flex:1;height:4px;background:#d9dce4;border-radius:2px;overflow:hidden;}
+  .vc-progress span{display:block;height:100%;width:0;background:var(--blue);border-radius:2px;}
+  .vc-time{font-size:12px;color:var(--t3);white-space:nowrap;min-width:34px;text-align:right;}
   .vc-check{width:24px;height:24px;border-radius:50%;border:2px solid #c4c8d2;flex-shrink:0;
     margin-left:auto;position:relative;transition:all .2s;}
   .voice-card.selected .vc-check{background:var(--blue);border-color:var(--blue);}
@@ -1286,7 +1291,13 @@
     resultsEl.innerHTML = names.map((n,i)=>`
       <div class="voice-card" data-i="${i}">
         <button class="vc-play" type="button" aria-label="试听">▶</button>
-        <span class="vc-name">${n}</span>
+        <div class="vc-body">
+          <span class="vc-name">${n}</span>
+          <div class="vc-progress-row">
+            <div class="vc-progress"><span></span></div>
+            <span class="vc-time">${fmtTime(dur.seconds)}</span>
+          </div>
+        </div>
         <span class="vc-check" aria-label="选择"></span>
       </div>`).join("");
     resultsEl.classList.remove("hidden");
@@ -1304,21 +1315,44 @@
         confirmBtn.disabled = false;
       }
       card.addEventListener("click", selectThis);
-      // 试听（播放按钮切换图标）
+      // 试听（播放按钮切换图标 + 进度条）
       const playBtn = card.querySelector(".vc-play");
-      playBtn.addEventListener("click",(e)=>{ e.stopPropagation(); selectThis(); playClip(playBtn, dur.seconds); });
+      const bar = card.querySelector(".vc-progress span");
+      const timeEl = card.querySelector(".vc-time");
+      playBtn.addEventListener("click",(e)=>{ e.stopPropagation(); selectThis(); playClip(playBtn, dur.seconds, false, bar, timeEl); });
     });
   }
 
-  let playingTimer = null;
-  // 试听播放：切换播放/暂停图标，到时自动停止
-  function playClip(btn, seconds, restart){
+  let playingTimer = null, playingRaf = null;
+  // 试听播放：切换播放/暂停图标，进度条随时间填充，到时自动停止
+  function playClip(btn, seconds, restart, bar, timeEl){
     const total = seconds||3;
+    // 停止其他卡片
     document.querySelectorAll(".vc-play").forEach(b=>{ if(b!==btn) b.textContent="▶"; });
-    clearTimeout(playingTimer);
-    if(!restart && btn.textContent==="❚❚"){ btn.textContent="▶"; return; }
+    document.querySelectorAll(".vc-progress span").forEach(s=>{ if(s!==bar) s.style.width="0"; });
+    clearTimeout(playingTimer); cancelAnimationFrame(playingRaf);
+    if(!restart && btn.textContent==="❚❚"){
+      btn.textContent="▶";
+      if(bar) bar.style.width="0";
+      if(timeEl) timeEl.textContent = fmtTime(total);
+      return;
+    }
     btn.textContent="❚❚";
-    playingTimer = setTimeout(()=>{ btn.textContent="▶"; }, total*1000);
+    const start = performance.now();
+    const ms = total*1000;
+    const tick = (now)=>{
+      const elapsed = now - start;
+      const pct = Math.min(elapsed/ms*100, 100);
+      if(bar) bar.style.width = pct+"%";
+      if(timeEl) timeEl.textContent = fmtTime(Math.min(elapsed/1000, total));
+      if(elapsed < ms){ playingRaf = requestAnimationFrame(tick); }
+      else{
+        btn.textContent="▶";
+        if(timeEl) timeEl.textContent = fmtTime(total);
+        setTimeout(()=>{ if(bar) bar.style.width="0"; }, 400);
+      }
+    };
+    playingRaf = requestAnimationFrame(tick);
   }
   // 合成页用的进度条式播放
   let synthTimer = null;
