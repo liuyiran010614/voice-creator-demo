@@ -350,10 +350,29 @@
     display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;align-items:start;}
   @media (max-width:860px){.synth-wrap{grid-template-columns:1fr;}}
   .synth-left{display:flex;flex-direction:column;gap:12px;min-width:0;}
-  .synth-voice{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;
-    box-shadow:var(--shadow);padding:14px 18px;flex-wrap:wrap;}
+  .synth-voice{display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:#fff;border-radius:12px;
+    box-shadow:var(--shadow);padding:14px 18px;}
   .synth-avatar{flex-shrink:0;}
   .synth-vinfo{flex:1;min-width:0;display:flex;align-items:center;gap:8px;}
+  /* 发音人小卡片列表 */
+  .synth-voice-chips{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0;align-items:center;}
+  .synth-voice-chip{display:inline-flex;align-items:center;gap:6px;border:1.5px dashed var(--line);
+    border-radius:8px;padding:5px 10px;background:#fff;font-size:13px;color:var(--t1);transition:border-color .15s,box-shadow .15s;}
+  .synth-voice-chip:hover{border-color:var(--blue);box-shadow:0 0 0 2px rgba(78,110,242,.1);}
+  .synth-voice-chip:has(.chip-del:hover){border-color:#e53e3e;box-shadow:0 0 0 2px rgba(229,62,62,.1);}
+  .synth-voice-chip .chip-av{width:28px;height:28px;border-radius:50%;background:transparent;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:20px;flex-shrink:0;}
+  .synth-voice-chip .chip-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .synth-voice-chip .chip-name{font-size:14px;font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .synth-voice-chip .chip-del{border:none;background:none;cursor:pointer;color:var(--t3);padding:0;line-height:1;font-size:14px;flex-shrink:0;transition:color .15s;}
+  .synth-voice-chip .chip-del:hover{color:#e53e3e;}
+  /* 添加发音人按钮 */
+  .synth-add-voice-btn{border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:8px;
+    padding:5px 14px;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1.5;font-weight:500;
+    display:inline-flex;align-items:center;justify-content:center;gap:4px;}
+  .synth-add-voice-btn:hover{background:var(--blue-light);}
+  /* 已在chips中的picker项：置灰不可点 */
+  .synth-picker-item.disabled-chip{opacity:0.4;cursor:not-allowed;}
   .synth-change-btn{border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:8px;
     padding:6px 14px;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
   .synth-change-btn:hover{background:var(--blue-light);}
@@ -760,12 +779,10 @@
       <div class="synth-left">
         <!-- 发音人信息 + 换发音人（合并在同一卡片内）-->
         <div class="synth-voice" id="synthVoiceCard">
-          <span class="synth-avatar" id="synthAvatar">🎙️</span>
-          <div class="synth-vinfo">
-            <span class="synth-vname" id="synthVName">发音人</span>
-            <span class="synth-vtag" id="synthVTag"></span>
+          <div class="synth-voice-chips" id="synthVoiceChips">
+            <!-- 发音人小卡片由JS渲染 -->
           </div>
-          <button class="synth-change-btn" id="synthChangeBtn" type="button">换发音人</button>
+          <button class="synth-add-voice-btn" id="synthChangeBtn" type="button">＋ 添加发音人</button>
           <!-- 换发音人面板（展开在卡片内部） -->
           <div class="synth-picker hidden" id="synthPicker">
             <div class="synth-picker-head">
@@ -1469,11 +1486,19 @@
     }else if(curLibTab==="mine"){
       const mine = getList().map((v,i)=>({v,i})).reverse();
       cards = mine.filter(({v})=>match(v) && matchPub(v)).map(({v,i})=>mineCardHtml(v,i));
-    }else if(curLibTab==="fav"){
-      const favIds = getFavs();
-      const favVoices = STORE_VOICES.filter(v=>favIds.includes(v.id)).filter(match);
-      cards = favVoices.map(v=>storeCardHtml(v, "fav"));
-    }
+  }else if(curLibTab==="fav"){
+    const favIds = getFavs();
+    // 公共音色库中的收藏
+    const favStore = STORE_VOICES.filter(v=>favIds.includes(v.id)).filter(match);
+    // 我的音色库中的收藏（用 id 或 "mine"+i 匹配）
+    const favMine = getList()
+      .map((v,i)=>({v,i}))
+      .filter(({v,i})=> favIds.includes(v.id||("mine"+i)) && match(v));
+    cards = [
+      ...favStore.map(v=>storeCardHtml(v,"fav")),
+      ...favMine.map(({v,i})=>mineCardHtml(v,i))
+    ];
+  }
 
     const pager = $("storePager");
     if(cards.length===0){
@@ -1685,26 +1710,28 @@ function mineCardHtml(v, i){
     const filtered = q ? all.filter(v=>(v.name||"").toLowerCase().includes(q)) : all;
     const el = $("synthPickerList");
     if(filtered.length===0){ el.innerHTML=`<div style="color:var(--t3);font-size:13px;padding:8px;">没有匹配的发音人</div>`; return; }
-    el.innerHTML = filtered.map(v=>{
-      const key = v.id||v.name;
-      const active = synthPickerSelected.some(s=>s._key===key);
-      const av = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||key));
-      return `<div class="synth-picker-item${active?" active":""}" data-key="${key}">
-        <span class="synth-picker-av">${av}</span>
-        <div class="synth-picker-info">
-          <div class="synth-picker-name">${escapeHtml(v.name)}${genderTagHtml(v.gender)}</div>
-          <div class="synth-picker-desc">${escapeHtml(v.desc||"")}</div>
-        </div>
-      </div>`;
-    }).join("");
-    el.querySelectorAll(".synth-picker-item").forEach(item=>{
-      item.addEventListener("click",()=>{
-        const key = item.dataset.key;
-        const voice = filtered.find(v=>(v.id||v.name)===key);
-        const idx = synthPickerSelected.findIndex(s=>s._key===key);
-        if(idx>=0){ synthPickerSelected.splice(idx,1); item.classList.remove("active"); }
-        else{ synthPickerSelected.push({...voice, _key:key}); item.classList.add("active"); }
-        $("synthPickerCount").textContent = "已选 "+synthPickerSelected.length+" 个";
+  el.innerHTML = filtered.map(v=>{
+    const key = v.id||v.name;
+    const active = synthPickerSelected.some(s=>s._key===key);
+    const alreadyInChips = synthPickerSelected.some(s=>s._key===key);
+    const av = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||key));
+    return `<div class="synth-picker-item${active?" active":""}${alreadyInChips?" disabled-chip":""}" data-key="${key}">
+      <span class="synth-picker-av">${av}</span>
+      <div class="synth-picker-info">
+        <div class="synth-picker-name">${escapeHtml(v.name)}${genderTagHtml(v.gender)}</div>
+        <div class="synth-picker-desc">${escapeHtml(v.desc||"")}</div>
+      </div>
+    </div>`;
+  }).join("");
+  el.querySelectorAll(".synth-picker-item").forEach(item=>{
+    item.addEventListener("click",()=>{
+      const key = item.dataset.key;
+      if(item.classList.contains("disabled-chip")) return; // 已在chips中，不可重复选
+      const voice = filtered.find(v=>(v.id||v.name)===key);
+      const idx = synthPickerSelected.findIndex(s=>s._key===key);
+      if(idx>=0){ synthPickerSelected.splice(idx,1); item.classList.remove("active"); }
+      else{ synthPickerSelected.push({...voice, _key:key}); item.classList.add("active"); }
+      $("synthPickerCount").textContent = "已选 "+synthPickerSelected.length+" 个";
       });
     });
   }
@@ -1714,38 +1741,32 @@ function mineCardHtml(v, i){
     if(isOpen){
       // 收起
       $("synthPicker").classList.add("hidden");
-      $("synthChangeBtn").textContent = "换发音人";
+      $("synthChangeBtn").textContent = "＋ 添加发音人";
     } else {
-      // 展开
-      synthPickerSelected = [];
+      // 展开（不清空已选，允许追加）
       $("synthPickerSearch").value = "";
-      $("synthPickerCount").textContent = "已选 0 个";
+      $("synthPickerCount").textContent = "已选 "+synthPickerSelected.length+" 个";
       renderSynthPicker();
       $("synthPicker").classList.remove("hidden");
       $("synthChangeBtn").textContent = "取消";
     }
-  });
-  $("synthPickerSearch").addEventListener("input",e=>renderSynthPicker(e.target.value));
+  });  $("synthPickerSearch").addEventListener("input",e=>renderSynthPicker(e.target.value));
   $("synthPickerConfirm").addEventListener("click",()=>{
     if(synthPickerSelected.length===0){ showToastText("请至少选择一个发音人"); return; }
-    const v = synthPickerSelected[0];
-    synthCurrentVoiceName = v.name || "发音人";
-    $("synthAvatar").innerHTML = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||v.id));
-    $("synthVName").textContent = synthCurrentVoiceName + (synthPickerSelected.length>1?" 等"+synthPickerSelected.length+"人":"");
-    $("synthVTag").innerHTML = synthPickerSelected.length > 1 ? "" : genderTagHtml(v.gender)+ageTagHtml(v.age);
+    synthCurrentVoiceName = synthPickerSelected[0].name || "发音人";
+    renderVoiceChips();
     $("synthPicker").classList.add("hidden");
-    $("synthChangeBtn").textContent = "换发音人";
+    $("synthChangeBtn").textContent = "＋";
     showToastText("已选择 "+synthPickerSelected.length+" 个发音人");
   });
 
   function openSynthPage(v){
     synthCurrentVoiceName = v.name || "发音人";
-    synthPickerSelected = [];
+    const key = v.id || v.name;
+    synthPickerSelected = [{...v, _key: key}];
     $("synthPicker").classList.add("hidden");
-    $("synthChangeBtn").textContent = "换发音人";
-    $("synthAvatar").innerHTML = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||v.id));
-    $("synthVName").textContent = synthCurrentVoiceName;
-    $("synthVTag").innerHTML = genderTagHtml(v.gender)+ageTagHtml(v.age);
+    $("synthChangeBtn").textContent = "＋ 添加发音人";
+    renderVoiceChips();
     $("synthText").value = "";
     $("uploadName").textContent = "支持 txt 格式，上传后内容显示在此";
     $("synthOutput").classList.add("hidden");
@@ -1753,6 +1774,31 @@ function mineCardHtml(v, i){
     $("navStoreBtn").style.display = "none";
     $("backHome").style.display = "none";
     synthPage.classList.add("show");
+  }
+
+  function renderVoiceChips(){
+    const container = $("synthVoiceChips");
+    if(synthPickerSelected.length === 0){
+      container.innerHTML = `<span style="font-size:13px;color:var(--t3)">尚未选择发音人</span>`;
+      return;
+    }
+    container.innerHTML = synthPickerSelected.map((v,i)=>{
+      const avHtml = avatarImg((isEmoji(v.avatar)||isUploaded(v.avatar))?v.avatar:(v.name||v.id||("v"+i)));
+      return `<span class="synth-voice-chip" data-chip="${i}">
+        <span class="chip-av">${avHtml}</span>
+        <span class="chip-name">${escapeHtml(v.name||"发音人")}</span>
+        <button class="chip-del" data-chip-del="${i}" title="移除">×</button>
+      </span>`;
+    }).join("");
+    container.querySelectorAll("[data-chip-del]").forEach(btn=>{
+      btn.addEventListener("click",(e)=>{
+        e.stopPropagation();
+        const idx = +btn.dataset.chipDel;
+        synthPickerSelected.splice(idx,1);
+        if(synthPickerSelected.length > 0) synthCurrentVoiceName = synthPickerSelected[0].name || "发音人";
+        renderVoiceChips();
+      });
+    });
   }
   // 用事件委托绑定，避免绑定时机/脚本中断导致失效
   document.addEventListener("click",function(e){
